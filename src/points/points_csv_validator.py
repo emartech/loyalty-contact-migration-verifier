@@ -1,6 +1,6 @@
 import time
 
-class PointsCSVValidator:
+class PointsValidator:
     def __init__(self, csv_path):
         self.csv_path = csv_path
         self.delimiter = ','  # Assuming the same delimiter as the previous validator

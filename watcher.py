@@ -1,9 +1,9 @@
 import os
 import time
 import csv
-from src.vouchers.voucher_csv_validator_content import VoucherCSVValidatorBOM
-from src.contact.enhanced_contacts_csv_validator import EnhancedContactsCSVValidator
-from src.points.points_csv_validator import PointsCSVValidator
+from src.vouchers.voucher_csv_validator import VoucherValidator
+from src.contacts.contacts_csv_validator import ContactsValidator
+from src.points.points_csv_validator import PointsValidator
 
 
 def ensure_directories_exist():
@@ -48,7 +48,7 @@ def classify_csv(file_path):
     # Check exact match
     if headers == contacts_headers:
         # Create an instance of the validator
-        validator = EnhancedContactsCSVValidator(file_path)
+        validator = ContactsValidator(file_path)
 
         # Validate the CSV
         is_valid, message = validator.validate()
@@ -60,7 +60,7 @@ def classify_csv(file_path):
         return message
     elif headers == points_headers:
         # Create an instance of the validator
-        validator = PointsCSVValidator(file_path)
+        validator = PointsValidator(file_path)
 
         # Validate the CSV
         is_valid, message = validator.validate()
@@ -72,7 +72,7 @@ def classify_csv(file_path):
         return message
     elif headers == vouchers_headers:
         # Create an instance of the validator
-        validator = VoucherCSVValidatorBOM(file_path)
+        validator = VoucherValidator(file_path)
 
         # Validate the CSV
         is_valid, message = validator.validate()

@@ -1,7 +1,7 @@
 
 import time
 
-class EnhancedContactsCSVValidator:
+class ContactsValidator:
     def __init__(self, csv_path):
         self.csv_path = csv_path
         self.delimiter = ','

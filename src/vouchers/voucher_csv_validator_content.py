@@ -14,10 +14,10 @@ class VoucherCSVValidatorBOM:
 
     def validate(self):
         content = self._load_csv()
-        header = content[0].strip().split(self.delimiter)
-        if ("userId" not in header or "externalId" not in header):
+        headers = content[0].strip().split(self.delimiter)
+        if ("userId" not in headers or "externalId" not in headers):
             return False, f"Line 1: Both 'userId' and 'externalId' should be present: {content[0]}"
-        if set(header) - {"userId", "externalId"} != set(self.expected_columns) - {"userId", "externalId"}:
+        if set(headers) - {"userId", "externalId"} != set(self.expected_columns) - {"userId", "externalId"}:
             return False, f"Line 1: Incorrect or missing columns. Line content: {content[0]}"
         for index, row in enumerate(content[1:], start=2):  # start=2 because we're skipping the header
             values = row.strip().split(self.delimiter)

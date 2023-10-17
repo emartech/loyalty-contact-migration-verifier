@@ -1,4 +1,5 @@
 import time
+from src.utils.time_utils import _is_past_timestamp, _is_unix_millisecond_timestamp
 
 class VoucherValidator:
     def __init__(self, csv_path):
@@ -37,12 +38,8 @@ class VoucherValidator:
             return False, "Column 'code' should not be empty"
         try:
             expiration = int(values[6])
-            if self._is_past_timestamp(expiration):
+            if not _is_past_timestamp(expiration) and _is_unix_millisecond_timestamp(expiration):
                 return False, "Column 'expiration' should be a future UNIX timestamp in milliseconds"
         except ValueError:
             return False, "Column 'expiration' should be an integer (UNIX timestamp in milliseconds)"
         return True, ""
-
-    def _is_past_timestamp(self, timestamp_millis):
-        current_time_millis = int(time.time() * 1000)
-        return timestamp_millis < current_time_millis

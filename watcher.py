@@ -6,6 +6,18 @@ from src.contacts.contacts_csv_validator import ContactsValidator
 from src.points.points_csv_validator import PointsValidator
 
 
+def _check_for_non_printable_start(content):
+    first_char = content[0]
+    if not (first_char.isprintable() or first_char.isspace()):
+        return False, """Error: The file you have uploaded starts with a Byte Order Mark (BOM), which is not supported.
+
+What to do next:
+1. Open the file with a text editor like Notepad++.
+2. In Notepad++, go to the 'Encoding' menu, and select 'Encode in UTF-8 without BOM'.
+3. Save the file and put it back to the watch_folder for revalidation."""
+    return True, ""
+
+
 def ensure_directories_exist():
     """Ensure the necessary directories exist. If not, create them."""
     directories = [os.path.join(".", "watch_folder", "success"), os.path.join(".", "watch_folder", "error")]
@@ -27,16 +39,16 @@ def has_file_stopped_growing(file_path):
 def classify_csv(file_path):
     # Try to decode using utf-8 first
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, 'r') as file:
             content = file.read()
     except UnicodeDecodeError:
         # If utf-8 fails, try ISO-8859-1
         with open(file_path, 'r', encoding='ISO-8859-1') as file:
             content = file.read()
 
-    # Clean the content by removing non-printable characters
-    content = ''.join(ch for ch in content if ch.isprintable() or ch.isspace())
-    
+    if _check_for_non_printable_start(content)[0] == False:
+        return "error", _check_for_non_printable_start(content)[1]
+        
     # Now, process the cleaned content
     reader = csv.reader(content.splitlines())
     headers = next(reader)  # Extract the first line, which is the header

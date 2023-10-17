@@ -1,4 +1,5 @@
 import time
+from src.utils.time_utils import _is_past_timestamp, _is_unix_millisecond_timestamp
 
 class PointsValidator:
     def __init__(self, csv_path):
@@ -64,7 +65,7 @@ class PointsValidator:
         elif values[6].lower() == "false":
             try:
                 expiration = int(values[5])
-                if not self._is_future_timestamp(expiration):
+                if not _is_past_timestamp(expiration) and _is_unix_millisecond_timestamp(expiration):
                     return False, f"Error in line {row_number} ({row_content}): expireAt should be a future UNIX timestamp in milliseconds when setPlanExpiration is FALSE"
             except ValueError:
                 return False, f"Error in line {row_number} ({row_content}): expireAt should be an integer (UNIX timestamp in milliseconds) when setPlanExpiration is FALSE"
@@ -72,7 +73,3 @@ class PointsValidator:
             return False, f"Error in line {row_number} ({row_content}): setPlanExpiration should be either TRUE or FALSE"
 
         return True, ""
-
-    def _is_future_timestamp(self, timestamp_millis):
-        current_time_millis = int(time.time() * 1000)
-        return timestamp_millis > current_time_millis

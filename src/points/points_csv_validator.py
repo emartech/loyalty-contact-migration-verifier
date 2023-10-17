@@ -13,35 +13,48 @@ class PointsValidator:
 
     def validate(self):
         content = self._load_csv()
-        headers = content[0].strip().split(self.delimiter)
-        if headers != self.expected_columns:
-            return False, f"Incorrect columns. Expected: {', '.join(self.expected_columns)}. Found: {', '.join(headers)}"
-        
-        for index, row in enumerate(content[1:], start=2):  # Start from 2 to account for 1-indexed human-readable row numbers
+        header = content[0].strip().split(self.delimiter)
+
+        if header != self.expected_columns:
+            return False, "Incorrect column order or missing columns"
+
+        for idx, row in enumerate(content[1:], start=2):  # Start index from 2 considering 1-based indexing and header row
             values = row.strip().split(self.delimiter)
-            is_valid, error_message = self._validate_row(values, index, row)
+            is_valid, error_message = self._validate_row(values)
             if not is_valid:
-                return False, error_message
-                
+                return False, f"Row {idx}: {row}. Error: {error_message}"
+
         return True, "CSV is valid"
 
-    def _validate_row(self, values, row_number, row_content):
-        # Validate pointsToSpend
-        if not values[1].isdigit():
-            return False, f"Error in line {row_number} ({row_content}): pointsToSpend should be a positive integer"
+    def _validate_row(self, values):
+        # Extract the required values
+        points_to_spend, status_points, cashback = values[1], values[2], values[3]
+        
+        # Check if at least one of the values is valid and positive
+        valid_pts = (points_to_spend.isdigit() and int(points_to_spend) > 0)
+        valid_status = (status_points.isdigit() and int(status_points) > 0)
+        try:
+            valid_cashback = (float(cashback) >= 0)
+        except ValueError:
+            valid_cashback = False
 
-        # Validate statusPoints
-        if not values[2].isdigit():
-            return False, f"Error in line {row_number} ({row_content}): statusPoints should be a positive integer"
+        if not (valid_pts or valid_status or valid_cashback):
+            return False, "At least one of 'pointsToSpend', 'statusPoints', or 'cashback' must have a valid positive value."
 
-        # Validate cashback
-        if values[3]:  # Check if cashback is not empty
+        # Ensure no negative values
+        if (points_to_spend and int(points_to_spend) < 0) or (status_points and int(status_points) < 0) or (valid_cashback and float(cashback) < 0):
+            return False, "Negative values are not allowed."
+        
+        # Ensure correct data types
+        if points_to_spend and not points_to_spend.isdigit():
+            return False, "Column 'pointsToSpend' should be an integer."
+        if status_points and not status_points.isdigit():
+            return False, "Column 'statusPoints' should be an integer."
+        if cashback:
             try:
-                cashback_value = float(values[3])
-                if cashback_value < 0:
-                    return False, f"Error in line {row_number} ({row_content}): cashback should be a positive float"
+                float(cashback)
             except ValueError:
-                return False, f"Error in line {row_number} ({row_content}): cashback should be a positive float or empty"
+                return False, "Column 'cashback' should be a float."
 
 
         # Validate expireAt and setPlanExpiration

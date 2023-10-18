@@ -17,14 +17,14 @@ class VoucherValidator:
         content = self._load_csv()
         headers = content[0].strip().split(self.delimiter)
         if ("userId" not in headers or "externalId" not in headers):
-            return False, f"Line 1: Both 'userId' and 'externalId' should be present: {content[0]}"
+            return False, f"Line 1: Both 'userId' and 'externalId' should be present:\n{content[0]}"
         if set(headers) - {"userId", "externalId"} != set(self.expected_columns) - {"userId", "externalId"}:
-            return False, f"Line 1: Incorrect or missing columns. Line content: {content[0]}"
+            return False, f"Line 1: Incorrect or missing columns. Line content:\n{content[0]}"
         for index, row in enumerate(content[1:], start=2):  # start=2 because we're skipping the header
             values = row.strip().split(self.delimiter)
             is_valid, error_message = self._validate_row(values)
             if not is_valid:
-                return False, f"Line {index}: {error_message}. Line content: {row}"
+                return False, f"Line {index}: {error_message}. Line content:\n{row}"
         return True, "CSV is valid"
 
     def _validate_row(self, values):

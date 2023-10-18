@@ -5,27 +5,45 @@ from src.vouchers.voucher_csv_validator import VoucherValidator
 from src.contacts.contacts_csv_validator import ContactsValidator
 from src.points.points_csv_validator import PointsValidator
 
-
-def _check_for_non_printable_start(content):
-    first_char = content[0]
-    if not (first_char.isprintable() or first_char.isspace()):
-        return False, """Error: The file you have uploaded starts with a Byte Order Mark (BOM), which is not supported.
-
-What to do next:
-1. Open the file with a text editor like Notepad++.
-2. In Notepad++, go to the 'Encoding' menu, and select 'Encode in UTF-8 without BOM'.
-3. Save the file and put it back to the watch_folder for revalidation."""
-    return True, ""
-
-
 def ensure_directories_exist():
     """Ensure the necessary directories exist. If not, create them."""
-    directories = [os.path.join(".", "watch_folder", "success"), os.path.join(".", "watch_folder", "error")]
+    directories = [
+        os.path.join(".", "watch_folder", "success"),
+        os.path.join(".", "watch_folder", "error")
+    ]
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
 ensure_directories_exist()
+
+
+def generate_unique_filename(directory, original_name):
+    base, ext = os.path.splitext(original_name)
+    counter = 1
+    new_name = f"{base}_edited{ext}"
+    while os.path.exists(os.path.join(directory, new_name)):
+        new_name = f"{base}_edited_{counter}{ext}"
+        counter += 1
+    return new_name
+
+def _check_for_non_printable_start(file_path):
+    with open(file_path, 'rb') as file:
+        content = file.read()
+        
+    # Check for UTF-8 BOM
+    if content.startswith(b'\xef\xbb\xbf'):
+        # Find a new name for the new file using generate_unique_filename
+        new_name = generate_unique_filename(os.path.join(".", "watch_folder"), os.path.basename(file_path))
+        # update the file_path with the new_name
+        file_path_edited = os.path.join(".", "watch_folder", new_name)
+        # Save the modified content without BOM to the watch_folder
+        with open(file_path_edited, 'wb') as file:
+            file.write(content[3:])
+        
+        return False, "The file started with a Byte Order Mark (BOM), which is not supported."
+    
+    return True, ""
 
 watch_directory = os.path.join(".", "watch_folder")
 previous_files = set(os.listdir(watch_directory))
@@ -45,9 +63,9 @@ def classify_csv(file_path):
         # If utf-8 fails, try ISO-8859-1
         with open(file_path, 'r', encoding='ISO-8859-1') as file:
             content = file.read()
-
-    if _check_for_non_printable_start(content)[0] == False:
-        return "error", _check_for_non_printable_start(content)[1]
+    error , error_message = _check_for_non_printable_start(file_path)
+    if error == False:
+        return "error", error_message
         
     # Now, process the cleaned content
     reader = csv.reader(content.splitlines())
@@ -98,11 +116,11 @@ def classify_csv(file_path):
         return "error", generate_error_message(os.path.basename(file_path), headers, contacts_headers, points_headers, vouchers_headers)
 
 def generate_error_message(filename, headers_found, contacts_headers, points_headers, vouchers_headers):
-    error_msg = f"We checked whether the file {filename} in the watch_folder contains the expected columns for the following categories:\n"
-    error_msg += f"\nContacts:\n{', '.join(contacts_headers)}"
-    error_msg += f"\nPoints:\n{', '.join(points_headers)}"
-    error_msg += f"\nVouchers:\n{', '.join(vouchers_headers)}"
-    error_msg += f"\nHowever, we detected these columns instead:\n{', '.join(headers_found)}"
+    error_msg = f"The header in file {filename} does not match any of the expected headers:\n"
+    error_msg += f"\nFailed:      {', '.join(headers_found)}"
+    error_msg += f"\nContacts:    {', '.join(contacts_headers)}"
+    error_msg += f"\nPoints:      {', '.join(points_headers)}"
+    error_msg += f"\nVouchers:    {', '.join(vouchers_headers)}"
     return error_msg
 
 while True:
@@ -114,11 +132,12 @@ while True:
             full_path = os.path.join(watch_directory, file)
             while not has_file_stopped_growing(full_path):
                 pass
-            if classify_csv(full_path)[0] == "error":
+            error, error_message = classify_csv(full_path)
+            if error == "error":
                 # the second argument is the error message. Save that to a .log file with the same name as the csv
                 error_log_path = os.path.join(watch_directory, "error", os.path.splitext(os.path.basename(full_path))[0] + ".log")
                 with open(error_log_path, "w") as f:
-                    f.write(classify_csv(full_path)[1])
+                    f.write(error_message)
                 # Move the file to the error folder
                 os.rename(full_path, os.path.join(watch_directory, "error", os.path.basename(full_path)))
             else:

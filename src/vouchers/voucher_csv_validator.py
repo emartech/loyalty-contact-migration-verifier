@@ -20,11 +20,11 @@ class VoucherValidator:
             return False, f"Line 1: Both 'userId' and 'externalId' should be present:\n{content[0]}"
         if set(headers) - {"userId", "externalId"} != set(self.expected_columns) - {"userId", "externalId"}:
             return False, f"Line 1: Incorrect or missing columns. Line content:\n{content[0]}"
-        for index, row in enumerate(content[1:], start=2):  # start=2 because we're skipping the header
+        for idx, row in enumerate(content[1:], start=2):  # start=2 because we're skipping the header
             values = row.strip().split(self.delimiter)
             is_valid, error_message = self._validate_row(values)
             if not is_valid:
-                return False, f"Line {index}: {error_message}. Line content:\n{row}"
+                return False, f"Error: {error_message}\nRow {idx}:\n{content[0]}{row}"
         return True, "CSV is valid"
 
     def _validate_row(self, values):
@@ -38,10 +38,12 @@ class VoucherValidator:
             return False, "Column 'code' should not be empty"
         try:
             expiration = int(values[6])
-            if not _is_unix_millisecond_timestamp(expiration):
-                return False, "Column 'expiration' should be a valid UNIX timestamp in milliseconds"
-            if _is_past_timestamp(expiration):
-                return False, "Column 'expiration' should be a future UNIX timestamp in milliseconds"
+            valid, error_message = _is_unix_millisecond_timestamp(expiration)
+            if not valid:
+                return False, error_message
+            past, error_message = _is_past_timestamp(expiration)
+            if past:
+                return False, error_message
         except ValueError:
             return False, "Column 'expiration' should be an integer (UNIX timestamp in milliseconds)"
         return True, ""

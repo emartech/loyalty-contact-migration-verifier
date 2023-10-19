@@ -22,16 +22,18 @@ class ContactsValidator:
             return False, "Incorrect column order or missing columns"
 
         # Validate each row
-        for index, row in enumerate(content[1:], start=2):  # Start from 2 to account for 1-indexed human-readable row numbers
+        for idx, row in enumerate(content[1:], start=2):  # Start from 2 to account for 1-indexed human-readable row numbers
             values = row.strip().split(self.delimiter)
-            is_valid, error_message_suffix = self._validate_row(values)
+            is_valid, error_message = self._validate_row(values)
             if not is_valid:
-                error_message = f"Error in line {index} ({row}): {error_message_suffix}"
+                error_message = f"Error: {error_message}\nRow {idx}:\n{content[0]}{row}"
                 return False, error_message
 
         return True, "CSV is valid"
 
     def _validate_row(self, values):
+        if not values[0]:
+            return False, "Column 'userId' should not be empty"
         # Validate shouldJoin
         if values[1] != "TRUE":
             return False, "Column 'shouldJoin' should be 'TRUE'"

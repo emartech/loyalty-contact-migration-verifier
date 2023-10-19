@@ -1,17 +1,24 @@
 import time
+from datetime import datetime
+
+# Constants for the range of valid Unix timestamps
+FROM_DATE = datetime(1900, 1, 1).timestamp() * 1000
+TILL_DATE = datetime(2100, 1, 1).timestamp() * 1000
 
 def _is_unix_millisecond_timestamp(timestamp):
-    if isinstance(timestamp, int) and timestamp > 0:
-        if timestamp < 1e9:  # Likely a Unix second timestamp (up to November 2001)
-            return False, "Timestamp likely in seconds format."
-        elif timestamp < 2e12:  # Reasonable range for a Unix millisecond timestamp (up to 2073)
-            return True, "Timestamp is a valid Unix millisecond timestamp."
+    try:
+        # Convert the timestamp to integer
+        timestamp_int = int(timestamp)
+        
+        # Check if the timestamp is within the range
+        if FROM_DATE <= timestamp_int <= TILL_DATE:
+            return True, "Timestamp is a valid Unix millisecond timestamp between {} and {}.".format(FROM_DATE, TILL_DATE)
         else:
-            return False, "Timestamp exceeds reasonable future date range."
-    else:
-        return False, "Timestamp is not a positive integer."
+            return False, "Timestamp {{}) is a valid Unix millisecond timestamp, but it is outside of the range from {} till {}.".format(timestamp_int,FROM_DATE, TILL_DATE)
+    except:
+        return False, "Timestamp ({}) is not a valid Unix millisecond timestamp.".format(timestamp)
 
 def _is_past_timestamp(timestamp_millis):
     # Get current time in milliseconds
     current_time_millis = int(time.time() * 1000)
-    return timestamp_millis < current_time_millis
+    return timestamp_millis < current_time_millis, "Timestamp ({}) is in the past. Current timestamp: {}".format(timestamp_millis, current_time_millis)

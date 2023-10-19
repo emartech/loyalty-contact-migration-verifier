@@ -23,7 +23,7 @@ class PointsValidator:
             values = row.strip().split(self.delimiter)
             is_valid, error_message = self._validate_row(values)
             if not is_valid:
-                return False, f"Row {idx}: {row}. Error: {error_message}"
+                return False, f"Error: {error_message}\nRow {idx}:\n{content[0]}{row}"
 
         return True, "CSV is valid"
 
@@ -61,15 +61,19 @@ class PointsValidator:
         # Validate expireAt and setPlanExpiration
         if values[6].lower() == "true":
             if values[5]:  # If there's a value in expireAt
-                return False, f"Error in line {row_number} ({row_content}): If setPlanExpiration is TRUE, expireAt should be empty"
+                return False, f"If setPlanExpiration is TRUE, expireAt should be empty"
         elif values[6].lower() == "false":
             try:
                 expiration = int(values[5])
-                if not _is_past_timestamp(expiration) and _is_unix_millisecond_timestamp(expiration):
-                    return False, f"Error in line {row_number} ({row_content}): expireAt should be a future UNIX timestamp in milliseconds when setPlanExpiration is FALSE"
+                valid, error_message = _is_unix_millisecond_timestamp(expiration)
+                if not valid:
+                    return False, error_message
+                past, error_message = _is_past_timestamp(expiration)
+                if past:
+                    return False, f"expireAt should be a future UNIX timestamp in milliseconds when setPlanExpiration is FALSE"
             except ValueError:
-                return False, f"Error in line {row_number} ({row_content}): expireAt should be an integer (UNIX timestamp in milliseconds) when setPlanExpiration is FALSE"
+                return False, f"expireAt should be an integer (UNIX timestamp in milliseconds) when setPlanExpiration is FALSE"
         else:
-            return False, f"Error in line {row_number} ({row_content}): setPlanExpiration should be either TRUE or FALSE"
+            return False, f"setPlanExpiration should be either TRUE or FALSE"
 
         return True, ""

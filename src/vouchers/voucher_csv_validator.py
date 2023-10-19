@@ -38,7 +38,9 @@ class VoucherValidator:
             return False, "Column 'code' should not be empty"
         try:
             expiration = int(values[6])
-            if not _is_past_timestamp(expiration) and _is_unix_millisecond_timestamp(expiration):
+            if not _is_unix_millisecond_timestamp(expiration):
+                return False, "Column 'expiration' should be a valid UNIX timestamp in milliseconds"
+            if _is_past_timestamp(expiration):
                 return False, "Column 'expiration' should be a future UNIX timestamp in milliseconds"
         except ValueError:
             return False, "Column 'expiration' should be an integer (UNIX timestamp in milliseconds)"

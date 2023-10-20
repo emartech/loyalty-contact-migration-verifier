@@ -32,6 +32,8 @@ class ContactsValidator:
         return True, "CSV is valid"
 
     def _validate_row(self, values):
+        if len(values) != len(self.expected_columns):
+            return False, f"Row should have {len(self.expected_columns)} columns"
         if not values[0]:
             return False, "Column 'userId' should not be empty"
         # Validate shouldJoin

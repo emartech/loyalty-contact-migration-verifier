@@ -1,4 +1,6 @@
 import time
+import csv
+
 from src.utils.time_utils import _is_past_timestamp, _is_unix_millisecond_timestamp
 
 class VoucherValidator:
@@ -10,24 +12,30 @@ class VoucherValidator:
 
     def _load_csv(self):
         with open(self.csv_path, 'r', encoding='utf-8-sig') as file:
-            content = [line for line in file.readlines() if line.strip()]
+            reader = csv.reader(file, delimiter=self.delimiter, quotechar='"')
+            content = [row for row in reader if any(row)]
+            # content = [line for line in file.readlines() if line.strip()]
         return content
 
     def validate(self):
         content = self._load_csv()
-        headers = content[0].strip().split(self.delimiter)
+        headers = content[0]
+        # headers = content[0].strip().split(self.delimiter)
         if ("userId" not in headers or "externalId" not in headers):
             return False, f"Line 1: Both 'userId' and 'externalId' should be present:\n{content[0]}"
         if set(headers) - {"userId", "externalId"} != set(self.expected_columns) - {"userId", "externalId"}:
             return False, f"Line 1: Incorrect or missing columns. Line content:\n{content[0]}"
         for idx, row in enumerate(content[1:], start=2):  # start=2 because we're skipping the header
-            values = row.strip().split(self.delimiter)
+            values = row
+            # values = row.strip().split(self.delimiter)
             is_valid, error_message = self._validate_row(values)
             if not is_valid:
-                return False, f"Error: {error_message}\nRow {idx}:\n{content[0]}{row}"
+                return False, f"Error: {error_message}\nRow {idx}:\n{content[0]}\n{row}"
         return True, "CSV is valid"
 
     def _validate_row(self, values):
+        if len(values) != len(self.expected_columns):
+            return False, f"Row should have {len(self.expected_columns)} columns"
         if values[2] not in ["one_time", "yearly"]:
             return False, "Column 'voucherType' should be either 'one_time' or 'yearly'"
         if not values[3]:

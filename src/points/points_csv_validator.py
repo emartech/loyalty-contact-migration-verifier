@@ -28,6 +28,9 @@ class PointsValidator:
         return True, "CSV is valid"
 
     def _validate_row(self, values):
+        if len(values) != len(self.expected_columns):
+            return False, f"Row should have {len(self.expected_columns)} columns"
+
         # Extract the required values
         points_to_spend, status_points, cashback = values[1], values[2], values[3]
         

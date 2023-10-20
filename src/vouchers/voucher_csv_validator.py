@@ -12,22 +12,19 @@ class VoucherValidator:
 
     def _load_csv(self):
         with open(self.csv_path, 'r', encoding='utf-8-sig') as file:
-            reader = csv.reader(file, delimiter=self.delimiter, quotechar='"')
+            reader = csv.reader(file, delimiter=self.delimiter, quotechar='"') # quotechar is needed to handle quotes in the csv
             content = [row for row in reader if any(row)]
-            # content = [line for line in file.readlines() if line.strip()]
         return content
 
     def validate(self):
         content = self._load_csv()
         headers = content[0]
-        # headers = content[0].strip().split(self.delimiter)
         if ("userId" not in headers or "externalId" not in headers):
             return False, f"Line 1: Both 'userId' and 'externalId' should be present:\n{content[0]}"
         if set(headers) - {"userId", "externalId"} != set(self.expected_columns) - {"userId", "externalId"}:
             return False, f"Line 1: Incorrect or missing columns. Line content:\n{content[0]}"
         for idx, row in enumerate(content[1:], start=2):  # start=2 because we're skipping the header
             values = row
-            # values = row.strip().split(self.delimiter)
             is_valid, error_message = self._validate_row(values)
             if not is_valid:
                 return False, f"Error: {error_message}\nRow {idx}:\n{content[0]}\n{row}"

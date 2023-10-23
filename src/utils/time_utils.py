@@ -1,8 +1,14 @@
 import time
 from datetime import datetime
+import os
 
+OS_TYPE = os.name
 # Constants for the range of valid Unix timestamps
-FROM_DATE = datetime(1900, 1, 1).timestamp() * 1000
+# Windows OS has problems with timestamps before EPOCH
+if OS_TYPE == 'nt':
+    FROM_DATE = datetime(1970, 1, 2).timestamp() * 1000
+else:
+    FROM_DATE = datetime(1900, 1, 1).timestamp() * 1000
 TILL_DATE = datetime(2100, 1, 1).timestamp() * 1000
 
 def _is_unix_millisecond_timestamp(timestamp):

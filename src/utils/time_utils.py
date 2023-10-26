@@ -6,6 +6,8 @@ FROM_DATE = datetime(1970, 1, 2).timestamp() * 1000
 TILL_DATE = datetime(2100, 1, 1).timestamp() * 1000
 
 def _is_unix_millisecond_timestamp(timestamp):
+    if timestamp < 0:
+        return False, "Timestamp ({}) cannot be a negative value.".format(timestamp)
     try:
         # Convert the timestamp to integer
         timestamp_int = int(timestamp)

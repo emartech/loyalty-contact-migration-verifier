@@ -43,8 +43,11 @@ class ContactsValidator:
         # Validate joinDate
         try:
             join_date = int(values[2])
-            if not _is_past_timestamp(join_date) and _is_unix_millisecond_timestamp(join_date):
+            if not _is_past_timestamp(join_date):
                 return False, "Column 'joinDate' should be a past UNIX timestamp in milliseconds"
+            is_valid_unix_timestampe, message = _is_unix_millisecond_timestamp(join_date)
+            if not is_valid_unix_timestampe:
+                return False, message
         except ValueError:
             return False, "Column 'joinDate' should be an integer (UNIX timestamp in milliseconds)"
         

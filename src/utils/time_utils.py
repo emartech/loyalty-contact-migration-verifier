@@ -4,14 +4,12 @@ import os
 
 OS_TYPE = os.name
 # Constants for the range of valid Unix timestamps
-# Windows OS has problems with timestamps before EPOCH
-if OS_TYPE == 'nt':
-    FROM_DATE = datetime(1970, 1, 2).timestamp() * 1000
-else:
-    FROM_DATE = datetime(1900, 1, 1).timestamp() * 1000
+FROM_DATE = datetime(1970, 1, 2).timestamp() * 1000
 TILL_DATE = datetime(2100, 1, 1).timestamp() * 1000
 
 def _is_unix_millisecond_timestamp(timestamp):
+    if timestamp < 0:
+        return False, "Timestamp ({}) cannot be a negative value.".format(timestamp)
     try:
         # Convert the timestamp to integer
         timestamp_int = int(timestamp)

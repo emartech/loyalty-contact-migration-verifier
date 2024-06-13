@@ -75,45 +75,26 @@ def classify_csv(file_path):
     points_headers = ["userId", "pointsToSpend", "statusPoints", "cashback", "allocatedAt", "expireAt", "setPlanExpiration", "reason", "title", "description"]
     vouchers_headers = ["userId", "externalId", "voucherType", "voucherName", "iconName", "code", "expiration"]
 
-    # Check exact match
+    # Check exact header and create corresponding validator
     if headers == contacts_headers:
         # Create an instance of the validator
-        validator = ContactsValidator(file_path)
-
-        # Validate the CSV
-        is_valid, message = validator.validate()
-
-        if is_valid:
-            message = "contacts", "The CSV is valid!"
-        else:
-            message = "error", f"Validation failed: {message}"
-        return message
+        validator = ContactsValidator(file_path, contacts_headers)
     elif headers == points_headers:
         # Create an instance of the validator
-        validator = PointsValidator(file_path)
-
-        # Validate the CSV
-        is_valid, message = validator.validate()
-
-        if is_valid:
-            message = "points", "The CSV is valid!"
-        else:
-            message = "error", f"Validation failed: {message}"
-        return message
+        validator = PointsValidator(file_path, points_headers)
     elif headers == vouchers_headers:
         # Create an instance of the validator
-        validator = VoucherValidator(file_path)
-
-        # Validate the CSV
-        is_valid, message = validator.validate()
-
-        if is_valid:
-            message = "vouchers", "The CSV is valid!"
-        else:
-            message = "error", f"Validation failed: {message}"
-        return message
+        validator = VoucherValidator(file_path, vouchers_headers)
     else:
         return "error", generate_error_message(os.path.basename(file_path), headers, contacts_headers, points_headers, vouchers_headers)
+    # Validate the CSV
+    is_valid, message = validator.validate()
+
+    if is_valid:
+        message = "contacts", "The CSV is valid!"
+    else:
+        message = "error", f"Validation failed: {message}"
+    return message
 
 def generate_error_message(filename, headers_found, contacts_headers, points_headers, vouchers_headers):
     error_msg = f"The header in file {filename} does not match any of the expected headers:\n"

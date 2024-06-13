@@ -119,8 +119,7 @@ while True:
                 error_log_path = os.path.join(watch_directory, "error", os.path.splitext(os.path.basename(full_path))[0] + ".log")
                 with open(error_log_path, "w") as logFile:
                     logWriter = csv.writer(logFile)
-                    for entry in details:
-                        logWriter.writerow(entry)
+                    logWriter.writerows((entry,) for entry in details)
                 # Move the file to the error folder
                 os.rename(full_path, os.path.join(watch_directory, "error", os.path.basename(full_path)))
             else:

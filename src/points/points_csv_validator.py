@@ -6,7 +6,7 @@ class PointsValidator(Validator):
     points_columns = ["userId", "pointsToSpend", "statusPoints", "cashback", "allocatedAt", "expireAt", "setPlanExpiration", "reason", "title", "description"]
 
     def __init__(self, csv_path, expected_columns=points_columns):
-        super(self, csv_path, expected_columns)
+        super().__init__(csv_path=csv_path, expected_columns=expected_columns)
 
     def _validate_row(self, values):
         if len(values) != len(self.expected_columns):

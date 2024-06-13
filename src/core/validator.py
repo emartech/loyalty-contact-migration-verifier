@@ -1,3 +1,5 @@
+import csv
+
 class Validator:
     def __init__(self, csv_path, expected_columns):
         self.csv_path = csv_path
@@ -12,7 +14,7 @@ class Validator:
 
     def validate(self):
         content = self._load_csv()
-        headers = content[0].strip().split(self.delimiter)
+        headers = content[0]
         
         # This could be removed as we are checking the header before creating the validator already
         # Validate column order and presence
@@ -22,13 +24,12 @@ class Validator:
         # Validate each row
         errors = []
         for idx, row in enumerate(content[1:], start=2):  # Start from 2 to account for 1-indexed human-readable row numbers
-            values = row.strip().split(self.delimiter)
-            is_valid, error_message = self._validate_row(values)
+            is_valid, error_message = self._validate_row(row)
             if not is_valid:
-                error_message = f"Error: {error_message} Row {idx}: {content[0]}{row}"
-                errors.append(error_message)
+                error_message = [f"Error: {error_message} Row {idx}: {row}"]
+                errors = errors + error_message
         
-        if errors.count() > 0:
+        if len(errors) > 0:
             return False, errors
         
         return True, "CSV is valid"

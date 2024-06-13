@@ -7,7 +7,7 @@ class VoucherValidator(Validator):
     voucher_columns = ['userId', 'externalId', 'voucherType', 'voucherName', 'iconName', 'code', 'expiration']
 
     def __init__(self, csv_path, expected_columns=voucher_columns):
-        super(self, csv_path, expected_columns)
+        super().__init__(csv_path=csv_path, expected_columns=expected_columns)
         self.default_icon = "basket-colors-1"
 
     def _validate_row(self, values):

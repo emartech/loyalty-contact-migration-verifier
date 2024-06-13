@@ -86,14 +86,14 @@ def classify_csv(file_path):
         # Create an instance of the validator
         validator = VoucherValidator(file_path, vouchers_headers)
     else:
-        return "error", generate_error_message(os.path.basename(file_path), headers, contacts_headers, points_headers, vouchers_headers)
+        return "error", [generate_error_message(os.path.basename(file_path), headers, contacts_headers, points_headers, vouchers_headers)]
     # Validate the CSV
-    is_valid, message = validator.validate()
+    is_valid, details = validator.validate()
 
     if is_valid:
         message = "contacts", "The CSV is valid!"
     else:
-        message = "error", f"Validation failed: {message}"
+        message = "error", details
     return message
 
 def generate_error_message(filename, headers_found, contacts_headers, points_headers, vouchers_headers):
@@ -113,12 +113,14 @@ while True:
             full_path = os.path.join(watch_directory, file)
             while not has_file_stopped_growing(full_path):
                 pass
-            error, error_message = classify_csv(full_path)
+            error, details = classify_csv(full_path)
             if error == "error":
                 # the second argument is the error message. Save that to a .log file with the same name as the csv
                 error_log_path = os.path.join(watch_directory, "error", os.path.splitext(os.path.basename(full_path))[0] + ".log")
-                with open(error_log_path, "w") as f:
-                    f.write(error_message)
+                with open(error_log_path, "w") as logFile:
+                    logWriter = csv.writer(logFile)
+                    for entry in details:
+                        logWriter.writerow(entry)
                 # Move the file to the error folder
                 os.rename(full_path, os.path.join(watch_directory, "error", os.path.basename(full_path)))
             else:

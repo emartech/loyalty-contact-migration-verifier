@@ -5,9 +5,9 @@ class Validator:
         self.expected_columns = expected_columns
 
     def _load_csv(self):
-        # Load the CSV file, skipping empty lines
         with open(self.csv_path, 'r', encoding='utf-8-sig') as file:
-            content = [line for line in file.readlines() if line.strip()]
+            reader = csv.reader(file, delimiter=self.delimiter, quotechar='"') # quotechar is needed to handle quotes in the csv
+            content = [row for row in reader if any(row)]
         return content
 
     def validate(self):

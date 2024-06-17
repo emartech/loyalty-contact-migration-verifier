@@ -1,34 +1,14 @@
 import time
 import csv
-
 from src.utils.time_utils import _is_past_timestamp, _is_unix_millisecond_timestamp
+from src.core.validator import Validator
 
-class VoucherValidator:
-    def __init__(self, csv_path):
-        self.csv_path = csv_path
-        self.delimiter = ','
-        self.expected_columns = ['userId', 'externalId', 'voucherType', 'voucherName', 'iconName', 'code', 'expiration']
+class VoucherValidator(Validator):
+    voucher_columns = ['userId', 'externalId', 'voucherType', 'voucherName', 'iconName', 'code', 'expiration']
+
+    def __init__(self, csv_path, expected_columns=voucher_columns):
+        super().__init__(csv_path=csv_path, expected_columns=expected_columns)
         self.default_icon = "basket-colors-1"
-
-    def _load_csv(self):
-        with open(self.csv_path, 'r', encoding='utf-8-sig') as file:
-            reader = csv.reader(file, delimiter=self.delimiter, quotechar='"') # quotechar is needed to handle quotes in the csv
-            content = [row for row in reader if any(row)]
-        return content
-
-    def validate(self):
-        content = self._load_csv()
-        headers = content[0]
-        if ("userId" not in headers or "externalId" not in headers):
-            return False, f"Line 1: Both 'userId' and 'externalId' should be present:\n{content[0]}"
-        if set(headers) - {"userId", "externalId"} != set(self.expected_columns) - {"userId", "externalId"}:
-            return False, f"Line 1: Incorrect or missing columns. Line content:\n{content[0]}"
-        for idx, row in enumerate(content[1:], start=2):  # start=2 because we're skipping the header
-            values = row
-            is_valid, error_message = self._validate_row(values)
-            if not is_valid:
-                return False, f"Error: {error_message}\nRow {idx}:\n{content[0]}\n{row}"
-        return True, "CSV is valid"
 
     def _validate_row(self, values):
         if len(values) != len(self.expected_columns):

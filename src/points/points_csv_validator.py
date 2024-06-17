@@ -1,31 +1,12 @@
 import time
 from src.utils.time_utils import _is_past_timestamp, _is_unix_millisecond_timestamp
+from src.core.validator import Validator
 
-class PointsValidator:
-    def __init__(self, csv_path):
-        self.csv_path = csv_path
-        self.delimiter = ','  # Assuming the same delimiter as the previous validator
-        self.expected_columns = ["userId", "pointsToSpend", "statusPoints", "cashback", "allocatedAt", "expireAt", "setPlanExpiration", "reason", "title", "description"]
+class PointsValidator(Validator):
+    points_columns = ["userId", "pointsToSpend", "statusPoints", "cashback", "allocatedAt", "expireAt", "setPlanExpiration", "reason", "title", "description"]
 
-    def _load_csv(self):
-        with open(self.csv_path, 'r', encoding='utf-8-sig') as file:  # Handle BOM with encoding
-            content = [line for line in file.readlines() if line.strip()]
-        return content
-
-    def validate(self):
-        content = self._load_csv()
-        header = content[0].strip().split(self.delimiter)
-
-        if header != self.expected_columns:
-            return False, "Incorrect column order or missing columns"
-
-        for idx, row in enumerate(content[1:], start=2):  # Start index from 2 considering 1-based indexing and header row
-            values = row.strip().split(self.delimiter)
-            is_valid, error_message = self._validate_row(values)
-            if not is_valid:
-                return False, f"Error: {error_message}\nRow {idx}:\n{content[0]}{row}"
-
-        return True, "CSV is valid"
+    def __init__(self, csv_path, expected_columns=points_columns):
+        super().__init__(csv_path=csv_path, expected_columns=expected_columns)
 
     def _validate_row(self, values):
         if len(values) != len(self.expected_columns):

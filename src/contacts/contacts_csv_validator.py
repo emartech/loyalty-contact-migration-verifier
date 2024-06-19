@@ -10,32 +10,47 @@ class ContactsValidator(Validator):
         super().__init__(csv_path=csv_path, expected_columns=expected_columns)
 
     def _validate_row(self, values):
+        errors = []
         if len(values) != len(self.expected_columns):
-            return False, f"Row should have {len(self.expected_columns)} columns"
+            error_message = f"Row should have {len(self.expected_columns)} columns"
+            errors = errors + [error_message]
+            # If there are not enough fields in the row there is no need for further validation
+            return False, errors
+
         if not values[0]:
-            return False, "Column 'userId' should not be empty"
+            error_message = "Column 'userId' should not be empty"
+            errors = errors + [error_message]
         # Validate shouldJoin
         if values[1] != "TRUE":
-            return False, "Column 'shouldJoin' should be 'TRUE'"
+            error_message = "Column 'shouldJoin' should be 'TRUE'"
+            errors = errors + [error_message]
         
         # Validate joinDate
         try:
             join_date = int(values[2])
             if not _is_past_timestamp(join_date):
-                return False, "Column 'joinDate' should be a past UNIX timestamp in milliseconds"
+                error_message = "Column 'joinDate' should be a past UNIX timestamp in milliseconds"
+                errors = errors + [error_message]
             is_valid_unix_timestampe, message = _is_unix_millisecond_timestamp(join_date)
             if not is_valid_unix_timestampe:
-                return False, message
+                error_message =  message
+                errors = errors + [error_message]
         except ValueError:
-            return False, "Column 'joinDate' should be an integer (UNIX timestamp in milliseconds)"
+            error_message = "Column 'joinDate' should be an integer (UNIX timestamp in milliseconds)"
+            errors = errors + [error_message]
         
         # Validate tierEntryAt and tierCalcAt
         if values[4] or values[5]:
-            return False, "Columns 'tierEntryAt' and 'tierCalcAt' should be empty"
+            error_message = "Columns 'tierEntryAt' and 'tierCalcAt' should be empty"
+            errors = errors + [error_message]
         
         # Validate shouldReward
         if values[6] not in ["TRUE", "FALSE"]:
-            return False, "Column 'shouldReward' should be 'TRUE' or 'FALSE'"
+            error_message = "Column 'shouldReward' should be 'TRUE' or 'FALSE'"
+            errors = errors + [error_message]
+        
+        if len(errors) > 0:
+            return False, errors
         
         return True, ""
         

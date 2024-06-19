@@ -24,10 +24,11 @@ class Validator:
         # Validate each row
         errors = []
         for idx, row in enumerate(content[1:], start=2):  # Start from 2 to account for 1-indexed human-readable row numbers
-            is_valid, error_message = self._validate_row(row)
+            is_valid, row_errors = self._validate_row(row)
             if not is_valid:
-                error_message = [f"Error: {error_message} Row {idx}: {row}"]
-                errors = errors + error_message
+                for row_error in row_errors:
+                    row_error_message = [f"Error: {row_error} Row {idx}: {row}"]
+                    errors = errors + row_error_message
         
         if len(errors) > 0:
             return False, errors

@@ -4,6 +4,7 @@ import csv
 from src.vouchers.voucher_csv_validator import VoucherValidator
 from src.contacts.contacts_csv_validator import ContactsValidator
 from src.points.points_csv_validator import PointsValidator
+from src.core.logger import Logger
 
 def ensure_directories_exist():
     """Ensure the necessary directories exist. If not, create them."""
@@ -55,6 +56,9 @@ def has_file_stopped_growing(file_path):
     return size_before == size_after
 
 def classify_csv(file_path):
+    # Prepare error log
+    error_log_path = os.path.join(watch_directory, "error", os.path.splitext(os.path.basename(file_path))[0] + ".log")
+    error_logger = Logger(error_log_path) 
     # Try to decode using utf-8 first
     try:
         with open(file_path, 'r') as file:
@@ -65,7 +69,8 @@ def classify_csv(file_path):
             content = file.read()
     error , error_message = _check_for_non_printable_start(file_path)
     if error == False:
-        return "error", error_message
+        error_logger.log(error_message)
+        return False
         
     # Now, process the cleaned content
     reader = csv.reader(content.splitlines())
@@ -78,23 +83,20 @@ def classify_csv(file_path):
     # Check exact header and create corresponding validator
     if headers == contacts_headers:
         # Create an instance of the validator
-        validator = ContactsValidator(file_path, contacts_headers)
+        validator = ContactsValidator(file_path, error_log_path, contacts_headers)
     elif headers == points_headers:
         # Create an instance of the validator
-        validator = PointsValidator(file_path, points_headers)
+        validator = PointsValidator(file_path, error_log_path, points_headers)
     elif headers == vouchers_headers:
         # Create an instance of the validator
-        validator = VoucherValidator(file_path, vouchers_headers)
+        validator = VoucherValidator(file_path, error_log_path, vouchers_headers)
     else:
-        return "error", [generate_error_message(os.path.basename(file_path), headers, contacts_headers, points_headers, vouchers_headers)]
+        error_message = generate_error_message(os.path.basename(file_path), headers, contacts_headers, points_headers, vouchers_headers)
+        error_logger.log(error_message)
+        return False
+    
     # Validate the CSV
-    is_valid, details = validator.validate()
-
-    if is_valid:
-        message = "contacts", "The CSV is valid!"
-    else:
-        message = "error", details
-    return message
+    return validator.validate()
 
 def generate_error_message(filename, headers_found, contacts_headers, points_headers, vouchers_headers):
     error_msg = f"The header in file {filename} does not match any of the expected headers:\n"
@@ -113,18 +115,16 @@ while True:
             full_path = os.path.join(watch_directory, file)
             while not has_file_stopped_growing(full_path):
                 pass
-            error, details = classify_csv(full_path)
-            if error == "error":
-                # the second argument is the error message. Save that to a .log file with the same name as the csv
-                error_log_path = os.path.join(watch_directory, "error", os.path.splitext(os.path.basename(full_path))[0] + ".log")
-                with open(error_log_path, "w") as logFile:
-                    logWriter = csv.writer(logFile)
-                    logWriter.writerows((entry,) for entry in details)
-                # Move the file to the error folder
-                os.rename(full_path, os.path.join(watch_directory, "error", os.path.basename(full_path)))
-            else:
+            print("File found validating: " + os.path.basename(full_path))
+            is_valid = classify_csv(full_path)
+            if is_valid:
                 # Move the file to the success folder
                 os.rename(full_path, os.path.join(watch_directory, "success", os.path.basename(full_path)))
+                print("Validation finished the file " + os.path.basename(full_path) + " is valid")
+            else:
+                # Move the file to the error folder
+                os.rename(full_path, os.path.join(watch_directory, "error", os.path.basename(full_path)))
+                print("Validation finished the file " + os.path.basename(full_path) + " has errors")
 
     previous_files = current_files
     time.sleep(5)  # Check every 5 seconds

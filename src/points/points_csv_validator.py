@@ -5,8 +5,8 @@ from src.core.validator import Validator
 class PointsValidator(Validator):
     points_columns = ["userId", "pointsToSpend", "statusPoints", "cashback", "allocatedAt", "expireAt", "setPlanExpiration", "reason", "title", "description"]
 
-    def __init__(self, csv_path, expected_columns=points_columns):
-        super().__init__(csv_path=csv_path, expected_columns=expected_columns)
+    def __init__(self, csv_path, log_path, expected_columns=points_columns):
+        super().__init__(csv_path=csv_path, log_path=log_path, expected_columns=expected_columns)
 
     def _validate_row(self, values):
         errors = []
@@ -18,26 +18,7 @@ class PointsValidator(Validator):
 
         # Extract the required values
         points_to_spend, status_points, cashback = values[1], values[2], values[3]
-        
-        # Check if at least one of the values is valid and positive
-        valid_pts = (points_to_spend.isdigit() and int(points_to_spend) > 0)
-        valid_status = (status_points.isdigit() and int(status_points) > 0)
-        try:
-            valid_cashback = (float(cashback) >= 0)
-        except ValueError:
-            valid_cashback = False
 
-        if not (valid_pts or valid_status or valid_cashback):
-            error_message = "At least one of 'pointsToSpend', 'statusPoints', or 'cashback' must have a valid positive value."
-            errors = errors + [error_message]
-            # If no Valid Points, Status or Cashback the rest of the line does not need to be checked
-            return False, errors
-
-        # Ensure no negative values
-        if (points_to_spend and int(points_to_spend) < 0) or (status_points and int(status_points) < 0) or (valid_cashback and float(cashback) < 0):
-            error_message = "Negative values are not allowed."
-            errors = errors + [error_message]
-        
         # Ensure correct data types
         if points_to_spend and not points_to_spend.isdigit():
             error_message = "Column 'pointsToSpend' should be an integer."
@@ -52,6 +33,25 @@ class PointsValidator(Validator):
                 error_message = "Column 'cashback' should be a float."
                 errors = errors + [error_message]
 
+        # None of the points columns contain invalid data types
+        if len(errors) == 0:
+            # Check if at least one of the values is valid and positive
+            valid_pts = (points_to_spend.isdigit() and int(points_to_spend) > 0)
+            valid_status = (status_points.isdigit() and int(status_points) > 0)
+            try:
+                valid_cashback = (float(cashback) >= 0)
+            except ValueError:
+                valid_cashback = False
+
+            if not (valid_pts or valid_status or valid_cashback):
+                error_message = "At least one of 'pointsToSpend', 'statusPoints', or 'cashback' must have a valid positive value."
+                errors = errors + [error_message]
+            
+            # Ensure no negative values
+            if (points_to_spend and int(points_to_spend) < 0) or (status_points and int(status_points) < 0) or (valid_cashback and float(cashback) < 0):
+                error_message = "Negative values are not allowed."
+                errors = errors + [error_message]
+        
 
         # Validate expireAt and setPlanExpiration
         if values[6].lower() == "true":

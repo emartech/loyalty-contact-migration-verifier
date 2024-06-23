@@ -6,8 +6,8 @@ from src.core.validator import Validator
 class ContactsValidator(Validator):
     contact_columns = ['userId', 'shouldJoin', 'joinDate', 'tierName', 'tierEntryAt', 'tierCalcAt', 'shouldReward']
 
-    def __init__(self, csv_path, expected_columns=contact_columns):
-        super().__init__(csv_path=csv_path, expected_columns=expected_columns)
+    def __init__(self, csv_path, log_path, expected_columns=contact_columns):
+        super().__init__(csv_path=csv_path, log_path=log_path, expected_columns=expected_columns)
 
     def _validate_row(self, values):
         errors = []

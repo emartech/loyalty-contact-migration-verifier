@@ -1,10 +1,12 @@
 import csv
+from src.core.logger import Logger
 
 class Validator:
-    def __init__(self, csv_path, expected_columns):
+    def __init__(self, csv_path, log_path, expected_columns):
         self.csv_path = csv_path
         self.delimiter = ','
         self.expected_columns = expected_columns
+        self.error_logger = Logger(log_path=log_path)
 
     def _load_csv(self):
         with open(self.csv_path, 'r', encoding='utf-8-sig') as file:
@@ -19,19 +21,22 @@ class Validator:
         # This could be removed as we are checking the header before creating the validator already
         # Validate column order and presence
         if headers != self.expected_columns:
-            return False, ["Incorrect column order or missing columns"]
+            error_message = "Incorrect column order or missing columns"
+            self.error_logger.log(error_message)
+            return False
 
         # Validate each row
-        errors = []
+        has_errors = False
         for idx, row in enumerate(content[1:], start=2):  # Start from 2 to account for 1-indexed human-readable row numbers
             is_valid, row_errors = self._validate_row(row)
             if not is_valid:
+                has_errors = True
                 for row_error in row_errors:
                     row_error_message = [f"Error: {row_error} Row {idx}: {row}"]
-                    errors = errors + row_error_message
+                    self.error_logger.log(row_error_message[0])
         
-        if len(errors) > 0:
-            return False, errors
+        if has_errors:
+            return False
         
         return True, "CSV is valid"
 

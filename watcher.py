@@ -46,6 +46,16 @@ def _check_for_non_printable_start(file_path):
     
     return True, ""
 
+def check_user_id(row, error_logger, seen_user_ids):
+    if row['userId'] is None or row['userId'] == "NULL":
+        error_logger.log(f"Contact with ID {row['userId']} has a NULL or 'NULL' userId")
+        return False
+    if row['userId'] in seen_user_ids:
+        error_logger.log(f"Duplicate userId found: {row['userId']}")
+        return False
+    seen_user_ids.add(row['userId'])
+    return True
+
 watch_directory = os.path.join(".", "watch_folder")
 previous_files = set(os.listdir(watch_directory))
 
@@ -73,8 +83,8 @@ def classify_csv(file_path):
         return False
         
     # Now, process the cleaned content
-    reader = csv.reader(content.splitlines())
-    headers = next(reader)  # Extract the first line, which is the header
+    reader = csv.DictReader(content.splitlines())
+    headers = reader.fieldnames  # Extract the headers
 
     contacts_headers = ["userId", "shouldJoin", "joinDate", "tierName", "tierEntryAt", "tierCalcAt", "shouldReward"]
     points_headers = ["userId", "pointsToSpend", "statusPoints", "cashback", "allocatedAt", "expireAt", "setPlanExpiration", "reason", "title", "description"]
@@ -82,6 +92,10 @@ def classify_csv(file_path):
 
     # Check exact header and create corresponding validator
     if headers == contacts_headers:
+        seen_user_ids = set()
+        for row in reader:
+            if not check_user_id(row, error_logger, seen_user_ids):
+                return False
         # Create an instance of the validator
         validator = ContactsValidator(file_path, error_log_path, contacts_headers)
     elif headers == points_headers:

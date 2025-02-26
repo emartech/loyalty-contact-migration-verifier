@@ -47,7 +47,7 @@ def _check_for_non_printable_start(file_path):
     return True, ""
 
 def check_user_id(row, error_logger, seen_user_ids):
-    if row['userId'] is None or row['userId'] == "NULL":
+    if row['userId'] is None or row['userId'] == "NULL" or row['userId'] == "null":
         error_logger.log(f"Contact with ID {row['userId']} has a NULL or 'NULL' userId")
         return False
     if row['userId'] in seen_user_ids:
@@ -142,6 +142,3 @@ while True:
 
     previous_files = current_files
     time.sleep(5)  # Check every 5 seconds
-
-
-

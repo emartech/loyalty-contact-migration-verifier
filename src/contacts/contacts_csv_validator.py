@@ -1,4 +1,3 @@
-
 import time
 from src.utils.time_utils import _is_past_timestamp, _is_unix_millisecond_timestamp
 from src.core.validator import Validator
@@ -8,6 +7,7 @@ class ContactsValidator(Validator):
 
     def __init__(self, csv_path, log_path, expected_columns=contact_columns):
         super().__init__(csv_path=csv_path, log_path=log_path, expected_columns=expected_columns)
+        self.seen_user_ids = set()
 
     def _validate_row(self, values):
         errors = []
@@ -20,6 +20,15 @@ class ContactsValidator(Validator):
         if not values[0]:
             error_message = "Column 'userId' should not be empty"
             errors = errors + [error_message]
+        elif values[0] == "NULL":
+            error_message = "Column 'userId' should not be 'NULL'"
+            errors = errors + [error_message]
+        elif values[0] in self.seen_user_ids:
+            error_message = f"Duplicate userId found: {values[0]}"
+            errors = errors + [error_message]
+        else:
+            self.seen_user_ids.add(values[0])
+
         # Validate shouldJoin
         if values[1] != "TRUE":
             error_message = "Column 'shouldJoin' should be 'TRUE'"
@@ -53,4 +62,3 @@ class ContactsValidator(Validator):
             return False, errors
         
         return True, ""
-        

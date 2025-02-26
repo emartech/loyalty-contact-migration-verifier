@@ -13,37 +13,30 @@ class VoucherValidator(Validator):
     def _validate_row(self, values):
         errors = []
         if len(values) != len(self.expected_columns):
-            error_message = f"Row should have {len(self.expected_columns)} columns"
-            errors = errors + [error_message]
-            # If there are not enough fields in the row there is no need for further validation
-            return False, errors
+            errors.append(f"Row should have {len(self.expected_columns)} columns")
 
         if not values[0] and not values[1]:
-            error_message = "Column 'userId' and 'externalId' should not be empty at the same time"
-            errors = errors + [error_message]
+            errors.append("Column 'userId' and 'externalId' should not be empty at the same time")
         if values[2] not in ["one_time", "yearly"]:
-            error_message = "Column 'voucherType' should be either 'one_time' or 'yearly'"
-            errors = errors + [error_message]
+            errors.append("Column 'voucherType' should be either 'one_time' or 'yearly'")
         if not values[3]:
-            error_message = "Column 'voucherName' should not be empty"
-            errors = errors + [error_message]
+            errors.append("Column 'voucherName' should not be empty")
         if not values[4]:
-            error_message = "Column 'iconName' should not be empty"
-            errors = errors + [error_message]
+            errors.append("Column 'iconName' should not be empty")
         if not values[5]:
-            error_message = "Column 'code' should not be empty"
-            errors = errors + [error_message]
+            errors.append("Column 'code' should not be empty")
         try:
             expiration = int(values[6])
-            valid, error_message = _is_unix_millisecond_timestamp(expiration)
+            valid, message = _is_unix_millisecond_timestamp(expiration)
             if not valid:
-                errors = errors + [error_message]
-            past, error_message = _is_past_timestamp(expiration)
+                errors.append(message)
+            past, message = _is_past_timestamp(expiration)
             if past:
-                errors = errors + [error_message]
+                errors.append(message)
         except ValueError:
-            error_message = "Column 'expiration' should be an integer (UNIX timestamp in milliseconds)"
-            errors = errors + [error_message]
-        if len(errors) > 0:
-            return False, errors
+            errors.append("Column 'expiration' should be an integer (UNIX timestamp in milliseconds)")
+        
+        if errors:
+            return False, "; ".join(errors)
+        
         return True, ""

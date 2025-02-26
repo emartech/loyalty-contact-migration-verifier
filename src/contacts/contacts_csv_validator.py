@@ -12,53 +12,41 @@ class ContactsValidator(Validator):
     def _validate_row(self, values):
         errors = []
         if len(values) != len(self.expected_columns):
-            error_message = f"Row should have {len(self.expected_columns)} columns"
-            errors = errors + [error_message]
-            # If there are not enough fields in the row there is no need for further validation
-            return False, errors
+            errors.append(f"Row should have {len(self.expected_columns)} columns")
 
         if not values[0]:
-            error_message = "Column 'userId' should not be empty"
-            errors = errors + [error_message]
+            errors.append("Column 'userId' should not be empty")
         elif values[0] == "NULL":
-            error_message = "Column 'userId' should not be 'NULL'"
-            errors = errors + [error_message]
+            errors.append("Column 'userId' should not be 'NULL'")
         elif values[0] in self.seen_user_ids:
-            error_message = f"Duplicate userId found: {values[0]}"
-            errors = errors + [error_message]
+            errors.append(f"Duplicate userId found: {values[0]}")
         else:
             self.seen_user_ids.add(values[0])
 
         # Validate shouldJoin
         if values[1] != "TRUE":
-            error_message = "Column 'shouldJoin' should be 'TRUE'"
-            errors = errors + [error_message]
+            errors.append("Column 'shouldJoin' should be 'TRUE'")
         
         # Validate joinDate
         try:
             join_date = int(values[2])
             if not _is_past_timestamp(join_date):
-                error_message = "Column 'joinDate' should be a past UNIX timestamp in milliseconds"
-                errors = errors + [error_message]
+                errors.append("Column 'joinDate' should be a past UNIX timestamp in milliseconds")
             is_valid_unix_timestampe, message = _is_unix_millisecond_timestamp(join_date)
             if not is_valid_unix_timestampe:
-                error_message =  message
-                errors = errors + [error_message]
+                errors.append(message)
         except ValueError:
-            error_message = "Column 'joinDate' should be an integer (UNIX timestamp in milliseconds)"
-            errors = errors + [error_message]
+            errors.append("Column 'joinDate' should be an integer (UNIX timestamp in milliseconds)")
         
         # Validate tierEntryAt and tierCalcAt
         if values[4] or values[5]:
-            error_message = "Columns 'tierEntryAt' and 'tierCalcAt' should be empty"
-            errors = errors + [error_message]
+            errors.append("Columns 'tierEntryAt' and 'tierCalcAt' should be empty")
         
         # Validate shouldReward
         if values[6] not in ["TRUE", "FALSE"]:
-            error_message = "Column 'shouldReward' should be 'TRUE' or 'FALSE'"
-            errors = errors + [error_message]
+            errors.append("Column 'shouldReward' should be 'TRUE' or 'FALSE'")
         
-        if len(errors) > 0:
-            return False, errors
+        if errors:
+            return False, "; ".join(errors)
         
         return True, ""

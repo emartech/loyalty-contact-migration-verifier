@@ -31,9 +31,8 @@ class Validator:
             is_valid, row_errors = self._validate_row(row)
             if not is_valid:
                 has_errors = True
-                for row_error in row_errors:
-                    row_error_message = [f"Error: {row_error} Row {idx}: {row}"]
-                    self.error_logger.log(row_error_message[0])
+                row_error_message = f"Error: {row_errors} Row {idx}: {row}"
+                self.error_logger.log(row_error_message)
         
         if has_errors:
             return False
@@ -44,4 +43,3 @@ class Validator:
         if len(values) != len(self.expected_columns):
             return False, f"Row should have {len(self.expected_columns)} columns"
         return True, ""
-    

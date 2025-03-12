@@ -33,7 +33,7 @@ class PointsValidator(Validator):
             valid_pts = (points_to_spend.isdigit() and int(points_to_spend) > 0)
             valid_status = (status_points.isdigit() and int(status_points) > 0)
             try:
-                valid_cashback = (float(cashback) >= 0)
+                valid_cashback = (cashback and float(cashback) > 0)
             except ValueError:
                 valid_cashback = False
 

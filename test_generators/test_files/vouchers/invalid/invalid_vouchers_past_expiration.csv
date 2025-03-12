@@ -1,0 +1,11 @@
+userId,externalId,voucherType,voucherName,iconName,code,expiration
+user1,,one_time,10% Discount,discount-tag,DISCuser1-1741787044,1744375444071
+user2,,one_time,10% Discount,discount-tag,DISCuser2-1741787044,1744375444071
+user3,,one_time,10% Discount,discount-tag,DISCuser3-1741787044,1744375444071
+user4,,one_time,10% Discount,discount-tag,DISCuser4-1741787044,1744375444071
+user5,,one_time,10% Discount,discount-tag,DISCuser5-1741787044,1744375444071
+user6,,one_time,10% Discount,discount-tag,DISCuser6-1741787044,1744375444071
+user7,,one_time,10% Discount,discount-tag,DISCuser7-1741787044,1744375444071
+user8,,one_time,10% Discount,discount-tag,DISCuser8-1741787044,1744375444071
+user9,,one_time,10% Discount,discount-tag,DISCuser9-1741787044,1744375444071
+user10,,one_time,10% Discount,discount-tag,DISCuser10-1741787044,1739195044071

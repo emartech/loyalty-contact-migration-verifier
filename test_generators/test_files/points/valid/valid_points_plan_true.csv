@@ -1,0 +1,11 @@
+userId,pointsToSpend,statusPoints,cashback,allocatedAt,expireAt,setPlanExpiration,reason,title,description
+user1,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user2,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user3,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user4,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user5,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user6,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user7,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user8,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user9,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up
+user10,100,50,10.5,1739185044100,,TRUE,Welcome bonus,Welcome Points,Points awarded for signing up

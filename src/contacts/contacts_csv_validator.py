@@ -30,7 +30,8 @@ class ContactsValidator(Validator):
         # Validate joinDate
         try:
             join_date = int(values[2])
-            if not _is_past_timestamp(join_date):
+            is_past, message = _is_past_timestamp(join_date)
+            if not is_past:
                 errors.append("Column 'joinDate' should be a past UNIX timestamp in milliseconds")
             is_valid_unix_timestampe, message = _is_unix_millisecond_timestamp(join_date)
             if not is_valid_unix_timestampe:

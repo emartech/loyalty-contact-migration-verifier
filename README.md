@@ -1,7 +1,19 @@
 # loyalty-contact-migration-verifier
-wip collection of csv verifier scripts for https://help.emarsys.com/hc/en-us/articles/4607641387153-Implementation-Migrating-contact-information-to-Loyalty
+Collection of CSV verifier scripts for https://help.sap.com/docs/SAP_EMARSYS/f8e2fafeea804018a954a8857d9dfff3/fdeaab3d74c110148adef25c35266ee0.html?q=Implementation-Migrating-contact-information-to-Loyalty+
 
-Run the watcher.py script, then put the CSV files to the watch_folder and wait for the results
+---
+Instructions:
+
+1) Run the watcher.py script
+
 ```
 python3 watcher.py
 ```
+
+2) Put the CSV files in the watch_folder and wait while they are processed.
+
+3) Once completed, the files will be moved to the "Success" or "Error" folder.
+ 
+    Success = You can go ahead with the next steps on the migration
+
+    Error = You will need to review the log files generated and share the feedback with the customer for them to amend/fix.

@@ -2,7 +2,25 @@
 Collection of CSV verifier scripts for: https://help.sap.com/docs/SAP_EMARSYS/f8e2fafeea804018a954a8857d9dfff3/fdeaab3d74c110148adef25c35266ee0.html?q=Implementation-Migrating-contact-information-to-Loyalty+
 
 ---
-Instructions:
+🧩 Prerequisites:
+
+You must have Python installed on your computer to run this application.
+
+🔗 Download Python
+
+Windows: https://www.python.org/downloads/windows/
+
+MacOS: https://www.python.org/downloads/macos/
+
+To check if Python is already installed, open your Terminal (macOS) or Command Prompt (Windows) and run:
+```
+python3 --version
+```
+If Python is installed, you’ll see the version number displayed.
+
+---
+
+⚙️ Instructions:
 
 1) [Download](https://github.com/emartech/loyalty-contact-migration-verifier/archive/refs/heads/main.zip) the files from this repository and save them to a folder on your computer (e.g., your Desktop).
  <img width="1833" height="588" alt="image" src="https://github.com/user-attachments/assets/891718c5-e248-4e84-8ce8-0e756ca64979" />

@@ -37,7 +37,7 @@ class Validator:
         if has_errors:
             return False
         
-        return True, "CSV is valid"
+        return True
 
     def _validate_row(self, values: list[str]) -> tuple[bool, str]:
         if len(values) != len(self.expected_columns):

@@ -16,7 +16,7 @@ def _is_unix_millisecond_timestamp(timestamp):
         if FROM_DATE <= timestamp_int <= TILL_DATE:
             return True, "Timestamp is a valid Unix millisecond timestamp between {} and {}.".format(FROM_DATE, TILL_DATE)
         else:
-            return False, "Timestamp {{}) is a valid Unix millisecond timestamp, but it is outside of the range from {} till {}.".format(timestamp_int,FROM_DATE, TILL_DATE)
+            return False, "Timestamp ({}) is a valid Unix millisecond timestamp, but it is outside of the range from {} till {}.".format(timestamp_int, FROM_DATE, TILL_DATE)
     except:
         return False, "Timestamp ({}) is not a valid Unix millisecond timestamp.".format(timestamp)
 

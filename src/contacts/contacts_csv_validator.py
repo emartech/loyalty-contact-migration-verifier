@@ -33,8 +33,8 @@ class ContactsValidator(Validator):
             is_past, message = _is_past_timestamp(join_date)
             if not is_past:
                 errors.append("Column 'joinDate' should be a past UNIX timestamp in milliseconds")
-            is_valid_unix_timestampe, message = _is_unix_millisecond_timestamp(join_date)
-            if not is_valid_unix_timestampe:
+            is_valid_unix_timestamp, message = _is_unix_millisecond_timestamp(join_date)
+            if not is_valid_unix_timestamp:
                 errors.append(message)
         except ValueError:
             errors.append("Column 'joinDate' should be an integer (UNIX timestamp in milliseconds)")

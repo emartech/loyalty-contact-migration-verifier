@@ -14,7 +14,7 @@ RESULT=$?
 
 if [ $RESULT -ne 0 ]; then
     echo ""
-    echo "❌ Tests failed. Commit aborted."
+    echo "Tests failed. Commit aborted."
     echo "Fix the failing tests and try again."
     exit 1
 fi

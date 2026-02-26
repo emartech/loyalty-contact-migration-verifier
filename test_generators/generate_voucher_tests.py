@@ -52,42 +52,42 @@ def get_valid_row(user_id=None, external_id=None, voucher_type="one_time"):
 # Generate valid files
 def generate_valid_files():
     # 1. Valid file with userId only
-    with open("test_files/vouchers/valid/valid_vouchers_userId.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/valid/valid_vouchers_userId.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 11):
             writer.writerow(get_valid_row(user_id=f"user{i}"))
     
     # 2. Valid file with externalId only
-    with open("test_files/vouchers/valid/valid_vouchers_externalId.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/valid/valid_vouchers_externalId.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 11):
             writer.writerow(get_valid_row(external_id=f"ext{i}"))
     
     # 3. Valid file with both IDs
-    with open("test_files/vouchers/valid/valid_vouchers_both_ids.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/valid/valid_vouchers_both_ids.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 11):
             writer.writerow(get_valid_row(user_id=f"user{i}", external_id=f"ext{i}"))
     
     # 4. Valid file with one_time vouchers
-    with open("test_files/vouchers/valid/valid_vouchers_one_time.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/valid/valid_vouchers_one_time.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 11):
             writer.writerow(get_valid_row(user_id=f"user{i}", voucher_type="one_time"))
     
     # 5. Valid file with yearly vouchers
-    with open("test_files/vouchers/valid/valid_vouchers_yearly.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/valid/valid_vouchers_yearly.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 11):
             writer.writerow(get_valid_row(user_id=f"user{i}", voucher_type="yearly"))
     
     # 6. Valid file with mixed voucher types
-    with open("test_files/vouchers/valid/valid_vouchers_mixed.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/valid/valid_vouchers_mixed.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 11):
@@ -97,7 +97,7 @@ def generate_valid_files():
 # Generate invalid files
 def generate_invalid_files():
     # 1. Invalid: Both userId and externalId empty
-    with open("test_files/vouchers/invalid/invalid_vouchers_missing_ids.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/invalid/invalid_vouchers_missing_ids.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -109,7 +109,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # 2. Invalid: Wrong voucherType
-    with open("test_files/vouchers/invalid/invalid_vouchers_wrong_type.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/invalid/invalid_vouchers_wrong_type.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -120,7 +120,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # 3. Invalid: Empty voucherName
-    with open("test_files/vouchers/invalid/invalid_vouchers_empty_name.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/invalid/invalid_vouchers_empty_name.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -131,7 +131,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # 4. Invalid: Empty iconName
-    with open("test_files/vouchers/invalid/invalid_vouchers_empty_icon.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/invalid/invalid_vouchers_empty_icon.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -142,7 +142,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # 5. Invalid: Empty code
-    with open("test_files/vouchers/invalid/invalid_vouchers_empty_code.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/invalid/invalid_vouchers_empty_code.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -153,7 +153,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # 6. Invalid: Non-numeric expiration
-    with open("test_files/vouchers/invalid/invalid_vouchers_invalid_expiration.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/invalid/invalid_vouchers_invalid_expiration.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -164,7 +164,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # 7. Invalid: Past expiration
-    with open("test_files/vouchers/invalid/invalid_vouchers_past_expiration.csv", 'w', newline='') as csvfile:
+    with open("test_files/vouchers/invalid/invalid_vouchers_past_expiration.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=voucher_headers)
         writer.writeheader()
         for i in range(1, 10):

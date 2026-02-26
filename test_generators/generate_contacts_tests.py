@@ -51,7 +51,7 @@ def get_valid_row(user_id=None):
 # Generate valid files
 def generate_valid_files():
     # Valid file with TRUE shouldReward
-    with open("test_files/contacts/valid/valid_contacts_reward_true.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/valid/valid_contacts_reward_true.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 11):
@@ -60,7 +60,7 @@ def generate_valid_files():
             writer.writerow(row)
     
     # Valid file with FALSE shouldReward
-    with open("test_files/contacts/valid/valid_contacts_reward_false.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/valid/valid_contacts_reward_false.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 11):
@@ -71,7 +71,7 @@ def generate_valid_files():
 # Generate invalid files
 def generate_invalid_files():
     # Invalid: Empty userId
-    with open("test_files/contacts/invalid/invalid_contacts_empty_userId.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_empty_userId.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -82,7 +82,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # Invalid: NULL userId
-    with open("test_files/contacts/invalid/invalid_contacts_null_userId.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_null_userId.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -93,7 +93,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # Invalid: Duplicate userId
-    with open("test_files/contacts/invalid/invalid_contacts_duplicate_userId.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_duplicate_userId.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -102,7 +102,7 @@ def generate_invalid_files():
         writer.writerow(get_valid_row("user5"))
     
     # Invalid: shouldJoin not TRUE
-    with open("test_files/contacts/invalid/invalid_contacts_shouldJoin_not_true.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_shouldJoin_not_true.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -113,7 +113,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # Invalid: joinDate in future
-    with open("test_files/contacts/invalid/invalid_contacts_future_joinDate.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_future_joinDate.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -124,7 +124,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # Invalid: Non-numeric joinDate
-    with open("test_files/contacts/invalid/invalid_contacts_non_numeric_joinDate.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_non_numeric_joinDate.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -135,7 +135,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # Invalid: Non-empty tierEntryAt
-    with open("test_files/contacts/invalid/invalid_contacts_non_empty_tierEntryAt.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_non_empty_tierEntryAt.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -146,7 +146,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # Invalid: Non-empty tierCalcAt
-    with open("test_files/contacts/invalid/invalid_contacts_non_empty_tierCalcAt.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_non_empty_tierCalcAt.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):
@@ -157,7 +157,7 @@ def generate_invalid_files():
         writer.writerow(row)
     
     # Invalid: shouldReward not TRUE or FALSE
-    with open("test_files/contacts/invalid/invalid_contacts_invalid_shouldReward.csv", 'w', newline='') as csvfile:
+    with open("test_files/contacts/invalid/invalid_contacts_invalid_shouldReward.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=contact_headers)
         writer.writeheader()
         for i in range(1, 10):

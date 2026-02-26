@@ -23,7 +23,7 @@ class Logger:
     def _flush_buffer(self):
         """Write all buffered messages to file."""
         if self._buffer:
-            with open(self.log_path, 'a') as log_file:
+            with open(self.log_path, 'a', encoding='utf-8') as log_file:
                 for message in self._buffer:
                     log_file.write(message + '\n')
             self._buffer.clear()

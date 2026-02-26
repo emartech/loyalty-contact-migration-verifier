@@ -44,7 +44,7 @@ python3 watcher.py
  
    ✅ Success: The files have the correct structure required to proceed with the migration. Please contact SAP Emarsys Support and provide the verified files.
 
-   ❌ Error: Please review the generated log files and make the necessary amendments, updates, or fixes before proceeding.
+   Error: Please review the generated log files and make the necessary amendments, updates, or fixes before proceeding.
    
 
 
@@ -52,7 +52,7 @@ python3 watcher.py
 
 ---
 
-## 📋 Validation Rules
+## Validation Rules
 
 The validator supports three types of CSV files and applies specific validation rules to each:
 
@@ -101,7 +101,7 @@ The validator supports three types of CSV files and applies specific validation 
 
 **Examples:**
 - ✅ Correct: `1735689600000` (milliseconds)
-- ❌ Incorrect: `1735689600` (seconds - will be rejected)
+- Incorrect: `1735689600` (seconds - will be rejected)
 
 **Common Error:** If you receive an error like *"Timestamp appears to be in seconds format"*, multiply your timestamp by 1000 to convert from seconds to milliseconds.
 

@@ -2,8 +2,13 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import sys
 import time
 import csv
+
+# Enable ANSI/VT100 color codes on Windows 10+
+if sys.platform == 'win32':
+    os.system('')
 from datetime import datetime
 from src.vouchers.voucher_csv_validator import VoucherValidator
 from src.contacts.contacts_csv_validator import ContactsValidator
@@ -199,7 +204,7 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
             counter += 1
         details_log_path = os.path.join(log_dir, details_filename)
         
-        with open(details_log_path, 'w') as details_file:
+        with open(details_log_path, 'w', encoding='utf-8') as details_file:
             details_file.write("="*80 + "\n")
             details_file.write(f"DETAILED VALIDATION ERRORS FOR: {filename}\n")
             details_file.write("="*80 + "\n\n")
@@ -228,7 +233,7 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
     
     total_errors = len(errors) + timestamp_error_count + validator_error_count
     
-    with open(error_log_path, 'w') as log_file:
+    with open(error_log_path, 'w', encoding='utf-8') as log_file:
         log_file.write("="*60 + "\n")
         log_file.write(f"VALIDATION REPORT FOR: {filename}\n")
         log_file.write("="*60 + "\n\n")
@@ -358,7 +363,7 @@ def classify_csv(file_path):
     error_logger = Logger(error_log_path) 
     errors = []
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
         print("    File encoding: UTF-8")
     except UnicodeDecodeError:

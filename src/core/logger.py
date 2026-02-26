@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2024 SAP Emarsys
-# SPDX-License-Identifier: GPL-3.0-only
+# SPDX-License-Identifier: MIT
 
 class Logger:
     def __init__(self, log_path):

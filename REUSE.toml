@@ -7,22 +7,22 @@ SPDX-PackageDownloadLocation = "https://github.com/emartech/loyalty-contact-migr
 path = ["README.md", "docs/**", "**.ini", "**.json", ".gitignore"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 SAP Emarsys"
-SPDX-License-Identifier = "GPL-3.0-only"
+SPDX-License-Identifier = "MIT"
 
 [[annotations]]
 path = ["**.sh", ".githooks/**"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 SAP Emarsys"
-SPDX-License-Identifier = "GPL-3.0-only"
+SPDX-License-Identifier = "MIT"
 
 [[annotations]]
 path = ["test_generators/test_files/**/**.csv", "test_generators/**.json", "test_generators/README.md"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 SAP Emarsys"
-SPDX-License-Identifier = "GPL-3.0-only"
+SPDX-License-Identifier = "MIT"
 
 [[annotations]]
 path = "**/.DS_Store"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 SAP Emarsys"
-SPDX-License-Identifier = "GPL-3.0-only"
+SPDX-License-Identifier = "MIT"

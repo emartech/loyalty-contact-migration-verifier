@@ -1,8 +1,9 @@
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
-FROM_DATE = datetime(1970, 1, 2).timestamp() * 1000
-TILL_DATE = datetime(2100, 1, 1).timestamp() * 1000
+# Use timezone-aware datetime to avoid Windows epoch issues
+FROM_DATE = datetime(1970, 1, 2, tzinfo=timezone.utc).timestamp() * 1000
+TILL_DATE = datetime(2100, 1, 1, tzinfo=timezone.utc).timestamp() * 1000
 
 def _is_unix_millisecond_timestamp(timestamp):
     """

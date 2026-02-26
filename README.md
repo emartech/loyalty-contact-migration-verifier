@@ -124,3 +124,36 @@ The validator supports three types of CSV files and applies specific validation 
 ## 📖 Additional Resources
 
 Further details on the loyalty migration process can be found at: https://help.sap.com/docs/SAP_EMARSYS/f8e2fafeea804018a954a8857d9dfff3/fdeaab3d74c110148adef25c35266ee0.html?q=loyalty+migration
+
+---
+
+## 🛠️ Development
+
+### Setup
+
+To set up the development environment with tests and git hooks:
+
+```bash
+./setup-dev.sh
+```
+
+This will:
+- Create a virtual environment (`.venv`)
+- Install pytest
+- Configure git hooks to run tests on commit/push
+
+### Running Tests
+
+```bash
+source .venv/bin/activate
+pytest -v
+```
+
+### Git Hooks
+
+Pre-commit and pre-push hooks are configured to run the test suite automatically. If tests fail, the commit/push will be blocked.
+
+To manually enable hooks (if not using setup script):
+```bash
+git config core.hooksPath .githooks
+```

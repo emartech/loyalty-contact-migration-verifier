@@ -1,0 +1,23 @@
+#!/bin/sh
+# Pre-commit hook: Run tests before allowing commit
+
+echo "Running tests before commit..."
+
+# Check if virtual environment exists and use it
+if [ -d ".venv" ]; then
+    source .venv/bin/activate 2>/dev/null || . .venv/bin/activate
+fi
+
+# Run pytest
+python3 -m pytest -q
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo ""
+    echo "❌ Tests failed. Commit aborted."
+    echo "Fix the failing tests and try again."
+    exit 1
+fi
+
+echo "✅ All tests passed. Proceeding with commit."
+exit 0

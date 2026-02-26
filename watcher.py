@@ -44,27 +44,27 @@ def ensure_directories_exist():
             try:
                 os.makedirs(directory)
             except OSError as e:
-                colored_print(f"❌ Error creating directory {directory}: {e}", Colors.RED)
+                colored_print(f"Error creating directory {directory}: {e}", Colors.RED)
                 raise
 
 print_header()
 
 ensure_directories_exist()
 
-colored_print("📁 Setting up directories...", Colors.BLUE)
+colored_print(" Setting up directories...", Colors.BLUE)
 print(f"   Watch directory: {os.path.abspath(os.path.join('.', 'watch_folder'))}")
 print(f"   Success folder:  {os.path.abspath(os.path.join('.', 'watch_folder', 'success'))}")
 print(f"   Error folder:    {os.path.abspath(os.path.join('.', 'watch_folder', 'error'))}")
 print(f"   Logs folder:     {os.path.abspath(os.path.join('.', 'watch_folder', 'logs'))}")
 print()
-colored_print("📋 Supported file types:", Colors.BLUE)
+colored_print("Supported file types:", Colors.BLUE)
 print("   • Contacts CSV (userId, shouldJoin, joinDate, tierName, tierEntryAt, tierCalcAt, shouldReward)")
 print("   • Points CSV   (userId, pointsToSpend, statusPoints, cashback, allocatedAt, expireAt, setPlanExpiration, reason, title, description)")
 print("   • Vouchers CSV (userId, externalId, voucherType, voucherName, iconName, code, expiration)")
 print()
-colored_print("📥 To validate files: Drop your CSV files into the watch_folder directory", Colors.GREEN)
+colored_print(" To validate files: Drop your CSV files into the watch_folder directory", Colors.GREEN)
 print()
-colored_print("🔍 Checking for existing CSV files in watch folder...", Colors.YELLOW)
+colored_print(" Checking for existing CSV files in watch folder...", Colors.YELLOW)
 
 
 def generate_unique_filename(directory, original_name):
@@ -81,8 +81,8 @@ def _check_for_non_printable_start(file_path):
         content = file.read()
         
     if content.startswith(b'\xef\xbb\xbf'):
-        print(f"   ⚠️  UTF-8 BOM detected in file")
-        colored_print(f"   📝 BOM will be handled internally for validation", Colors.YELLOW)
+        print(f"     UTF-8 BOM detected in file")
+        colored_print(f"    BOM will be handled internally for validation", Colors.YELLOW)
         
         cleaned_content = content[3:].decode('utf-8')
         return False, "The file started with a Byte Order Mark (BOM), which is not supported.", cleaned_content
@@ -126,12 +126,12 @@ def process_existing_files():
                          if f.endswith('.csv') and not '_comma_fixed' in f]
     
     if existing_csv_files:
-        colored_print(f"📋 Found {len(existing_csv_files)} existing CSV file(s) to process", Colors.CYAN)
+        colored_print(f"Found {len(existing_csv_files)} existing CSV file(s) to process", Colors.CYAN)
         
         for file in existing_csv_files:
             full_path = os.path.join(watch_directory, file)
             file_size = os.path.getsize(full_path)
-            colored_print(f"\n📄 Processing existing file: {file}", Colors.BOLD + Colors.BLUE)
+            colored_print(f"\nProcessing existing file: {file}", Colors.BOLD + Colors.BLUE)
             file_size_mb = file_size / (1024 * 1024)
             if file_size_mb >= 1:
                 print(f"   Size: {file_size_mb:.1f} MB ({file_size:,} bytes)")
@@ -142,7 +142,7 @@ def process_existing_files():
             is_valid = classify_csv(full_path)
             processing_time = time.time() - start_time
             
-            colored_print(f"\n📊 PROCESSING COMPLETE", Colors.BOLD + Colors.PURPLE)
+            colored_print(f"\n PROCESSING COMPLETE", Colors.BOLD + Colors.PURPLE)
             print(f"   Original file: {file}")
             print(f"   Processing time: {processing_time:.2f} seconds")
             
@@ -150,22 +150,22 @@ def process_existing_files():
                 destination = os.path.join(watch_directory, "success", os.path.basename(full_path))
                 try:
                     os.rename(full_path, destination)
-                    colored_print(f"   ✅ Status: VALID", Colors.BOLD + Colors.GREEN)
-                    print(f"   📁 Moved to: success/{os.path.basename(full_path)}")
+                    colored_print(f"    Status: VALID", Colors.BOLD + Colors.GREEN)
+                    print(f"    Moved to: success/{os.path.basename(full_path)}")
                     processed_files['success'] += 1
                 except OSError as e:
-                    colored_print(f"   ⚠️  Error moving file to success folder: {e}", Colors.RED)
+                    colored_print(f"     Error moving file to success folder: {e}", Colors.RED)
                     processed_files['error'] += 1
             else:
                 destination = os.path.join(watch_directory, "error", os.path.basename(full_path))
                 try:
                     os.rename(full_path, destination)
-                    colored_print(f"   ❌ Status: ERRORS FOUND", Colors.BOLD + Colors.RED)
-                    print(f"   📁 Moved to: error/{os.path.basename(full_path)}")
-                    print(f"   📋 Error log: logs/{os.path.splitext(os.path.basename(full_path))[0]}.txt")
+                    colored_print(f"   Status: ERRORS FOUND", Colors.BOLD + Colors.RED)
+                    print(f"    Moved to: error/{os.path.basename(full_path)}")
+                    print(f"   Error log: logs/{os.path.splitext(os.path.basename(full_path))[0]}.txt")
                     processed_files['error'] += 1
                 except OSError as e:
-                    colored_print(f"   ⚠️  Error moving file to error folder: {e}", Colors.RED)
+                    colored_print(f"     Error moving file to error folder: {e}", Colors.RED)
                     processed_files['error'] += 1
             
             colored_print("-" * 60, Colors.CYAN)
@@ -174,7 +174,7 @@ def process_existing_files():
         
         return set(os.listdir(watch_directory))
     else:
-        colored_print("   ✅ No existing CSV files found", Colors.GREEN)
+        colored_print("    No existing CSV files found", Colors.GREEN)
         return set(os.listdir(watch_directory))
 
 def has_file_stopped_growing(file_path):
@@ -220,7 +220,7 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
                     for j, individual_error in enumerate(individual_errors, 1):
                         details_file.write(f"   {j}. {individual_error}\n")
                     
-                    details_file.write(f"\n   📋 Row Data: {row_data}\n")
+                    details_file.write(f"\n   Row Data: {row_data}\n")
                     details_file.write("\n" + "="*80 + "\n\n")
                 else:
                     details_file.write(f"#{i}. {error}\n")
@@ -232,7 +232,7 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
         log_file.write("="*60 + "\n")
         log_file.write(f"VALIDATION REPORT FOR: {filename}\n")
         log_file.write("="*60 + "\n\n")
-        log_file.write(f"❌ TOTAL ERRORS FOUND: {total_errors}\n\n")
+        log_file.write(f"TOTAL ERRORS FOUND: {total_errors}\n\n")
         
         error_count = 1
         has_bom_error = any("Byte Order Mark (BOM)" in error for error in errors)
@@ -242,8 +242,8 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
         if has_bom_error:
             log_file.write(f"{error_count}. BYTE ORDER MARK (BOM) ERROR\n")
             log_file.write("-" * 40 + "\n")
-            log_file.write("❌ Issue: The file started with a Byte Order Mark (BOM)\n")
-            log_file.write("💡 Solution: Remove the BOM from the file and save as UTF-8 without BOM\n\n\n")
+            log_file.write("Issue: The file started with a Byte Order Mark (BOM)\n")
+            log_file.write(" Solution: Remove the BOM from the file and save as UTF-8 without BOM\n\n\n")
             error_count += 1
         
         if has_separator_error:
@@ -251,25 +251,25 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
             log_file.write("-" * 40 + "\n")
             for error in errors:
                 if "semicolon" in error and "separators" in error:
-                    log_file.write("❌ Issue: File uses incorrect separator\n")
+                    log_file.write("Issue: File uses incorrect separator\n")
                     log_file.write(f"{error}\n")
-                    log_file.write("💡 Solution: Replace all semicolons (;) with commas (,) in the file\n\n\n")
+                    log_file.write(" Solution: Replace all semicolons (;) with commas (,) in the file\n\n\n")
                     break
             error_count += 1
         
         if timestamp_error_count > 0:
             log_file.write(f"{error_count}. TIMESTAMP FORMAT ERRORS\n")
             log_file.write("-" * 40 + "\n")
-            log_file.write(f"❌ Issue: Found {timestamp_error_count} timestamp errors\n")
-            log_file.write("💡 Common issues: UNIX timestamp is in seconds instead of milliseconds\n\n\n")
+            log_file.write(f"Issue: Found {timestamp_error_count} timestamp errors\n")
+            log_file.write(" Common issues: UNIX timestamp is in seconds instead of milliseconds\n\n\n")
             error_count += 1
             error_count += 1
         
         if validator_error_count > 0:
             log_file.write(f"{error_count}. DATA VALIDATION ERRORS\n")
             log_file.write("-" * 40 + "\n")
-            log_file.write(f"❌ Issue: Found {validator_error_count} data validation errors\n")
-            log_file.write("💡 Common issues: Invalid field values, empty required fields, incorrect format\n\n\n")
+            log_file.write(f"Issue: Found {validator_error_count} data validation errors\n")
+            log_file.write(" Common issues: Invalid field values, empty required fields, incorrect format\n\n\n")
             error_count += 1
         
         if has_header_error:
@@ -277,15 +277,15 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
             log_file.write("-" * 40 + "\n")
             for error in errors:
                 if "does not match" in error and "header" in error.lower():
-                    log_file.write(f"❌ Issue: Headers don't match expected format\n")
+                    log_file.write(f"Issue: Headers don't match expected format\n")
                     log_file.write(f"{error}\n")
-                    log_file.write("💡 Solution: Update headers to match one of the expected formats above\n\n")
+                    log_file.write(" Solution: Update headers to match one of the expected formats above\n\n")
                     break
         
         log_file.write("="*60 + "\n")
         
         if (timestamp_error_count > 0 or validator_error_count > 0) and validation_error_details and details_filename:
-            log_file.write(f"📋 Details: See {details_filename} for specific rows and error details\n")
+            log_file.write(f"Details: See {details_filename} for specific rows and error details\n")
             log_file.write("="*60 + "\n")
 
 def format_file_size(size_bytes):
@@ -304,22 +304,22 @@ def check_file_size_and_get_mode(file_path):
     size_display = format_file_size(file_size)
     
     if file_size_mb > 500:
-        colored_print(f"   ❌ File too large: {size_display} (Maximum: 500MB)", Colors.RED)
-        colored_print(f"   💡 Please split the file into smaller chunks for processing", Colors.YELLOW)
+        colored_print(f"   File too large: {size_display} (Maximum: 500MB)", Colors.RED)
+        colored_print(f"    Please split the file into smaller chunks for processing", Colors.YELLOW)
         return False, "oversized", file_size_mb
     
     elif file_size_mb > 100:
-        colored_print(f"   ⚠️  Large file detected: {size_display}", Colors.YELLOW)
-        colored_print(f"   📊 This may take several minutes and use significant memory", Colors.YELLOW)
-        colored_print(f"   🔄 Processing will use optimized streaming mode", Colors.CYAN)
+        colored_print(f"     Large file detected: {size_display}", Colors.YELLOW)
+        colored_print(f"    This may take several minutes and use significant memory", Colors.YELLOW)
+        colored_print(f"    Processing will use optimized streaming mode", Colors.CYAN)
         return True, "large_file", file_size_mb
     
     elif file_size_mb > 10:
-        colored_print(f"   📊 Medium file: {size_display} - using optimized processing", Colors.BLUE)
+        colored_print(f"    Medium file: {size_display} - using optimized processing", Colors.BLUE)
         return True, "medium_file", file_size_mb
     
     else:
-        colored_print(f"   📊 File size: {size_display}", Colors.GREEN)
+        colored_print(f"    File size: {size_display}", Colors.GREEN)
         return True, "normal", file_size_mb
 
 def count_file_rows(file_path, encoding='utf-8'):
@@ -344,13 +344,13 @@ def generate_unique_log_filename(logs_directory, original_name):
     return log_filename
 
 def classify_csv(file_path):
-    print("   🔍 Checking file size and requirements...")
+    print("    Checking file size and requirements...")
     
     size_ok, processing_mode, file_size_mb = check_file_size_and_get_mode(file_path)
     if not size_ok:
         return False
     
-    print("   🔍 Analyzing file encoding...")
+    print("    Analyzing file encoding...")
     logs_directory = os.path.join(watch_directory, "logs")
     original_filename = os.path.basename(file_path)
     unique_log_filename = generate_unique_log_filename(logs_directory, original_filename)
@@ -360,14 +360,14 @@ def classify_csv(file_path):
     try:
         with open(file_path, 'r') as file:
             content = file.read()
-        print("   ✅ File encoding: UTF-8")
+        print("    File encoding: UTF-8")
     except UnicodeDecodeError:
-        print("   ⚠️  UTF-8 failed, trying ISO-8859-1 encoding...")
+        print("     UTF-8 failed, trying ISO-8859-1 encoding...")
         with open(file_path, 'r', encoding='ISO-8859-1') as file:
             content = file.read()
-        print("   ✅ File encoding: ISO-8859-1")
+        print("    File encoding: ISO-8859-1")
     
-    print("   🔍 Checking for file format issues...")
+    print("    Checking for file format issues...")
     bom_result = _check_for_non_printable_start(file_path)
     has_bom = False
     
@@ -383,7 +383,7 @@ def classify_csv(file_path):
         if not is_valid:
             errors.append(error_message)
         
-    print("   🏗️  Parsing CSV structure...")
+    print("     Parsing CSV structure...")
     
     contacts_headers = ["userId", "shouldJoin", "joinDate", "tierName", "tierEntryAt", "tierCalcAt", "shouldReward"]
     points_headers = ["userId", "pointsToSpend", "statusPoints", "cashback", "allocatedAt", "expireAt", "setPlanExpiration", "reason", "title", "description"]
@@ -395,57 +395,57 @@ def classify_csv(file_path):
     
     delimiter = ','
     if headers not in [contacts_headers, points_headers, vouchers_headers]:
-        print(f"   📋 Headers found: {len(headers) if headers else 0} columns")
-        print("   🔍 Checking if file uses semicolon separator (unsupported)...")
+        print(f"   Headers found: {len(headers) if headers else 0} columns")
+        print("    Checking if file uses semicolon separator (unsupported)...")
         try:
             reader = csv.DictReader(content_lines, delimiter=';')
             semicolon_headers = reader.fieldnames
             if semicolon_headers in [contacts_headers, points_headers, vouchers_headers]:
-                print("   ⚠️  File uses semicolon separators, but comma is the accepted format")
+                print("     File uses semicolon separators, but comma is the accepted format")
                 separator_error = f"The file uses semicolon (;) separators, but comma (,) is the accepted format.\n\nFound: {'; '.join(semicolon_headers)}\nExpected: {', '.join(semicolon_headers)}"
                 errors.append(separator_error)
                 headers = semicolon_headers
                 delimiter = ';'
             else:
-                print("   ❌ Semicolon separator also doesn't match expected format")
+                print("   Semicolon separator also doesn't match expected format")
         except Exception as e:
-            print(f"   ❌ Error trying semicolon separator: {e}")
+            print(f"   Error trying semicolon separator: {e}")
     
-    print(f"   📋 Final headers: {len(headers) if headers else 0} columns")
-    print("   🔍 Identifying CSV type...")
+    print(f"   Final headers: {len(headers) if headers else 0} columns")
+    print("    Identifying CSV type...")
     if headers == contacts_headers:
-        print("   ✅ Detected: CONTACTS CSV")
-        print("   🔍 Checking for duplicate/null user IDs...")
+        print("    Detected: CONTACTS CSV")
+        print("    Checking for duplicate/null user IDs...")
         seen_user_ids = set()
         user_id_lines = {}
         null_user_id_lines = {}
         for line_number, row in enumerate(reader, start=2):
             check_user_id(row, user_id_lines, null_user_id_lines, line_number)
         log_user_id_errors(user_id_lines, null_user_id_lines, error_logger, errors)
-        print("   🔄 Creating contacts validator...")
+        print("    Creating contacts validator...")
         validator = ContactsValidator(file_path, None, contacts_headers, delimiter)
         if has_bom:
             validator._cleaned_content = content
     elif headers == points_headers:
-        print("   ✅ Detected: POINTS CSV")
-        print("   🛠️  Creating points validator...")
+        print("    Detected: POINTS CSV")
+        print("     Creating points validator...")
         validator = PointsValidator(file_path, None, points_headers, delimiter)
         if has_bom:
             validator._cleaned_content = content
     elif headers == vouchers_headers:
-        print("   ✅ Detected: VOUCHERS CSV")
-        print("   🛠️  Creating vouchers validator...")
+        print("    Detected: VOUCHERS CSV")
+        print("     Creating vouchers validator...")
         validator = VoucherValidator(file_path, None, vouchers_headers, delimiter)
         if has_bom:
             validator._cleaned_content = content
     else:
-        print("   ❌ Unknown CSV type - headers don't match expected format")
+        print("   Unknown CSV type - headers don't match expected format")
         error_message = generate_error_message(os.path.basename(file_path), headers, contacts_headers, points_headers, vouchers_headers)
         error_logger.log(error_message)
         errors.append(error_message)
         validator = None
     
-    print("   🔄 Running detailed validation...")
+    print("    Running detailed validation...")
     validation_result = False
     timestamp_error_count = 0
     
@@ -454,18 +454,18 @@ def classify_csv(file_path):
             try:
                 total_rows = count_file_rows(file_path)
                 if total_rows > 1000:
-                    colored_print(f"   📊 Processing {total_rows:,} rows with progress tracking...", Colors.CYAN)
+                    colored_print(f"    Processing {total_rows:,} rows with progress tracking...", Colors.CYAN)
                     validator._enable_progress_tracking = True
                     validator._total_rows = total_rows
             except Exception as e:
-                print(f"   ⚠️  Could not count rows for progress tracking: {e}")
+                print(f"     Could not count rows for progress tracking: {e}")
         
         validation_result = validator.validate()
         
         if hasattr(validator, '_timestamp_error_count'):
             timestamp_error_count = validator._timestamp_error_count
     else:
-        print("   ⚠️  No validator available - cannot check content-specific errors")
+        print("     No validator available - cannot check content-specific errors")
     
     if errors or not validation_result or timestamp_error_count > 0:
         if validator:
@@ -492,7 +492,7 @@ def classify_csv(file_path):
         only_bom_error = has_bom_error and total_errors_found == 1
         
         if only_bom_error:
-            print("   🔧 BOM is the only error - creating cleaned version for re-validation...")
+            print("    BOM is the only error - creating cleaned version for re-validation...")
             base_name = os.path.splitext(os.path.basename(file_path))[0]
             extension = os.path.splitext(os.path.basename(file_path))[1]
             cleaned_filename = f"{base_name}_edited{extension}"
@@ -501,37 +501,37 @@ def classify_csv(file_path):
             try:
                 with open(cleaned_file_path, 'w', encoding='utf-8') as cleaned_file:
                     cleaned_file.write(content)
-                print(f"   ✅ Created cleaned file: {cleaned_filename}")
+                print(f"    Created cleaned file: {cleaned_filename}")
                 
-                print("   🔄 Re-validating cleaned file...")
+                print("    Re-validating cleaned file...")
                 cleaned_result = classify_csv(cleaned_file_path)
                 
                 if cleaned_result:
-                    print(f"   ✅ Cleaned file validation: SUCCESS")
+                    print(f"    Cleaned file validation: SUCCESS")
                     success_path = os.path.join(watch_directory, "success", cleaned_filename)
                     os.rename(cleaned_file_path, success_path)
                 else:
-                    print(f"   ❌ Cleaned file validation: STILL HAS ERRORS")
+                    print(f"   Cleaned file validation: STILL HAS ERRORS")
                     error_path = os.path.join(watch_directory, "error", cleaned_filename)
                     os.rename(cleaned_file_path, error_path)
                     
             except Exception as e:
-                print(f"   ⚠️  Warning: Could not create/validate cleaned file: {e}")
+                print(f"     Warning: Could not create/validate cleaned file: {e}")
         elif has_bom_error:
-            print("   ℹ️  BOM error detected, but other errors also present - no auto-cleanup performed")
+            print("     BOM error detected, but other errors also present - no auto-cleanup performed")
         
         if '_temp_corrected.csv' in file_path and os.path.exists(file_path):
             try:
                 os.remove(file_path)
             except OSError as e:
-                print(f"   ⚠️  Warning: Could not remove temporary file: {e}")
+                print(f"     Warning: Could not remove temporary file: {e}")
         return False
     
     if '_temp_corrected.csv' in file_path and os.path.exists(file_path):
         try:
             os.remove(file_path)
         except OSError as e:
-            print(f"   ⚠️  Warning: Could not remove temporary file: {e}")
+            print(f"     Warning: Could not remove temporary file: {e}")
         
     return validation_result
 
@@ -577,14 +577,14 @@ def generate_error_message(filename, headers_found, contacts_headers, points_hea
 previous_files = process_existing_files()
 
 print()
-colored_print("🔍 Now watching for new CSV files... (Press Ctrl+C to stop)", Colors.YELLOW)
+colored_print(" Now watching for new CSV files... (Press Ctrl+C to stop)", Colors.YELLOW)
 colored_print("-" * 60, Colors.CYAN)
 
 try:
     if files_processed:
         timeout_start_time = time.time()
         print()
-        colored_print(f"⏰ Auto-completion timer started (10 seconds)", Colors.YELLOW)
+        colored_print(f" Auto-completion timer started (10 seconds)", Colors.YELLOW)
     else:
         timeout_start_time = None
     
@@ -595,12 +595,12 @@ try:
         for file in new_files:
             if file.endswith(".csv"):
                 if '_comma_fixed' in file:
-                    colored_print(f"   ⏭️  Skipping auto-generated comma-fixed file: {file}", Colors.CYAN)
+                    colored_print(f"     Skipping auto-generated comma-fixed file: {file}", Colors.CYAN)
                     continue
                     
                 full_path = os.path.join(watch_directory, file)
                 file_size = os.path.getsize(full_path)
-                colored_print(f"\n📄 New file detected: {file}", Colors.BOLD + Colors.BLUE)
+                colored_print(f"\nNew file detected: {file}", Colors.BOLD + Colors.BLUE)
                 file_size_mb = file_size / (1024 * 1024)
                 if file_size_mb >= 1:
                     print(f"   Size: {file_size_mb:.1f} MB ({file_size:,} bytes)")
@@ -609,15 +609,15 @@ try:
                 colored_print("   Waiting for file transfer to complete...", Colors.YELLOW)
                 
                 while not has_file_stopped_growing(full_path):
-                    colored_print("   ⏳ File still growing, waiting...", Colors.YELLOW)
+                    colored_print("    File still growing, waiting...", Colors.YELLOW)
                     
-                colored_print(f"   ✅ File transfer complete, starting validation...", Colors.GREEN)
+                colored_print(f"    File transfer complete, starting validation...", Colors.GREEN)
                 
                 start_time = time.time()
                 is_valid = classify_csv(full_path)
                 processing_time = time.time() - start_time
                 
-                colored_print(f"\n📊 PROCESSING COMPLETE", Colors.BOLD + Colors.PURPLE)
+                colored_print(f"\n PROCESSING COMPLETE", Colors.BOLD + Colors.PURPLE)
                 print(f"   Original file: {file}")
                 print(f"   Processing time: {processing_time:.2f} seconds")
                 
@@ -625,23 +625,23 @@ try:
                     destination = os.path.join(watch_directory, "success", os.path.basename(full_path))
                     try:
                         os.rename(full_path, destination)
-                        colored_print(f"   ✅ Status: VALID", Colors.BOLD + Colors.GREEN)
-                        print(f"   📁 Moved to: success/{os.path.basename(full_path)}")
+                        colored_print(f"    Status: VALID", Colors.BOLD + Colors.GREEN)
+                        print(f"    Moved to: success/{os.path.basename(full_path)}")
                         processed_files['success'] += 1
                     except OSError as e:
-                        colored_print(f"   ⚠️  Error moving file to success folder: {e}", Colors.RED)
+                        colored_print(f"     Error moving file to success folder: {e}", Colors.RED)
                         processed_files['error'] += 1
                 else:
                     destination = os.path.join(watch_directory, "error", os.path.basename(full_path))
                     try:
                         os.rename(full_path, destination)
                         error_log = os.path.join(watch_directory, "logs", os.path.splitext(os.path.basename(full_path))[0] + ".txt")
-                        colored_print(f"   ❌ Status: ERRORS FOUND", Colors.BOLD + Colors.RED)
-                        print(f"   📁 Moved to: error/{os.path.basename(full_path)}")
-                        print(f"   📋 Error log: logs/{os.path.splitext(os.path.basename(full_path))[0]}.txt")
+                        colored_print(f"   Status: ERRORS FOUND", Colors.BOLD + Colors.RED)
+                        print(f"    Moved to: error/{os.path.basename(full_path)}")
+                        print(f"   Error log: logs/{os.path.splitext(os.path.basename(full_path))[0]}.txt")
                         processed_files['error'] += 1
                     except OSError as e:
-                        colored_print(f"   ⚠️  Error moving file to error folder: {e}", Colors.RED)
+                        colored_print(f"     Error moving file to error folder: {e}", Colors.RED)
                         processed_files['error'] += 1
                 
                 files_processed = True
@@ -649,7 +649,7 @@ try:
                 if timeout_start_time is None:
                     timeout_start_time = time.time()
                     print()
-                    colored_print(f"⏰ Auto-completion timer started (10 seconds)", Colors.YELLOW)
+                    colored_print(f" Auto-completion timer started (10 seconds)", Colors.YELLOW)
                 
                 colored_print("-" * 60, Colors.CYAN)
 
@@ -661,35 +661,35 @@ try:
             
             if elapsed_time >= 10:
                 print()
-                colored_print(f"⏰ Auto-completion timeout reached", Colors.YELLOW)
+                colored_print(f" Auto-completion timeout reached", Colors.YELLOW)
                 print()
-                colored_print(f"📊 Final Statistics:", Colors.BOLD + Colors.CYAN)
-                print(f"   ✅ Successfully processed: {processed_files['success']} files")
-                print(f"   ❌ Files with errors: {processed_files['error']} files")
-                print(f"   📁 Total processed: {processed_files['success'] + processed_files['error']} files")
+                colored_print(f" Final Statistics:", Colors.BOLD + Colors.CYAN)
+                print(f"    Successfully processed: {processed_files['success']} files")
+                print(f"   Files with errors: {processed_files['error']} files")
+                print(f"    Total processed: {processed_files['success'] + processed_files['error']} files")
                 print()
-                colored_print(f"👋 Auto-completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", Colors.BOLD + Colors.GREEN)
+                colored_print(f" Auto-completed at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", Colors.BOLD + Colors.GREEN)
                 break
             elif remaining_time > 0:
-                print(f"\r⏳ Auto-completion in {remaining_time:.1f}s (Ctrl+C to stop early)" + " " * 20, end='\r')
+                print(f"\r Auto-completion in {remaining_time:.1f}s (Ctrl+C to stop early)" + " " * 20, end='\r')
         
         time.sleep(1)
 
 except KeyboardInterrupt:
     print()
     print()
-    colored_print("🛑 Shutdown requested by user", Colors.YELLOW)
+    colored_print(" Shutdown requested by user", Colors.YELLOW)
     print()
-    colored_print("📊 Final Statistics:", Colors.BOLD + Colors.CYAN)
+    colored_print(" Final Statistics:", Colors.BOLD + Colors.CYAN)
     
-    print(f"   ✅ Successfully processed: {processed_files['success']} files")
-    print(f"   ❌ Files with errors: {processed_files['error']} files")
-    print(f"   📁 Total processed: {processed_files['success'] + processed_files['error']} files")
+    print(f"    Successfully processed: {processed_files['success']} files")
+    print(f"   Files with errors: {processed_files['error']} files")
+    print(f"    Total processed: {processed_files['success'] + processed_files['error']} files")
     print()
-    colored_print(f"👋 Goodbye! Watcher stopped at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", Colors.BOLD + Colors.GREEN)
+    colored_print(f" Goodbye! Watcher stopped at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", Colors.BOLD + Colors.GREEN)
     
 except Exception as e:
     print()
     print()
-    colored_print(f"💥 Unexpected error occurred: {str(e)}", Colors.BOLD + Colors.RED)
-    colored_print("🔄 Please restart the watcher", Colors.YELLOW)
+    colored_print(f" Unexpected error occurred: {str(e)}", Colors.BOLD + Colors.RED)
+    colored_print(" Please restart the watcher", Colors.YELLOW)

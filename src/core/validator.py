@@ -61,9 +61,9 @@ class Validator:
                 else:
                     eta_str = f"ETA: {eta_seconds:.0f}sec"
                 
-                print(f"\r   ⏳ Progress: {self._processed_rows:,}/{self._total_rows:,} ({percent:.1f}%) - {eta_str}", end='', flush=True)
+                print(f"\r    Progress: {self._processed_rows:,}/{self._total_rows:,} ({percent:.1f}%) - {eta_str}", end='', flush=True)
             else:
-                print(f"\r   ⏳ Progress: {self._processed_rows:,}/{self._total_rows:,} ({percent:.1f}%)", end='', flush=True)
+                print(f"\r    Progress: {self._processed_rows:,}/{self._total_rows:,} ({percent:.1f}%)", end='', flush=True)
             
             self._last_progress_update = current_time
 
@@ -71,7 +71,7 @@ class Validator:
         # Initialize progress tracking
         if self._enable_progress_tracking:
             self._start_time = time.time()
-            print(f"   📊 Starting validation of {self._total_rows:,} rows...")
+            print(f"    Starting validation of {self._total_rows:,} rows...")
         
         content = self._load_csv()
         headers = content[0]
@@ -120,7 +120,7 @@ class Validator:
         
         # Complete progress tracking
         if self._enable_progress_tracking:
-            print(f"\r   ✅ Validation complete: {self._processed_rows:,} rows processed in {time.time() - self._start_time:.1f}s")
+            print(f"\r    Validation complete: {self._processed_rows:,} rows processed in {time.time() - self._start_time:.1f}s")
         
         # Handle timestamp errors
         if timestamp_error_rows:
@@ -134,7 +134,7 @@ class Validator:
         
         if has_errors:
             if self._enable_progress_tracking:
-                print(f"   ⚠️  Found {error_count:,} validation errors")
+                print(f"     Found {error_count:,} validation errors")
             return False
         
         return True

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 SAP Emarsys
+# SPDX-License-Identifier: GPL-3.0-only
+
 class Logger:
     def __init__(self, log_path):
         self.log_path = log_path

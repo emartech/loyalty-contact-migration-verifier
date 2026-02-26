@@ -1,4 +1,7 @@
 # Loyalty-contact-migration-verifier
+
+[![REUSE status](https://api.reuse.software/badge/github.com/emartech/loyalty-contact-migration-verifier)](https://api.reuse.software/info/github.com/emartech/loyalty-contact-migration-verifier)
+
 Collection of CSV verifier scripts for: https://help.sap.com/docs/SAP_EMARSYS/f8e2fafeea804018a954a8857d9dfff3/fdeaab3d74c110148adef25c35266ee0.html?q=Implementation-Migrating-contact-information-to-Loyalty+
 
 ---

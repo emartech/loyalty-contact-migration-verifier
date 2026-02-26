@@ -160,4 +160,22 @@ cython_debug/
 #.idea/
 
 watch_folder/
+.DS_Store# macOS
 .DS_Store
+**/.DS_Store
+
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# pytest
+.pytest_cache/

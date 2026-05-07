@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 SAP Emarsys
+# SPDX-FileCopyrightText: 2024 SAP Engagement Cloud
 # SPDX-License-Identifier: MIT
 
 import os
@@ -208,23 +208,19 @@ def write_summary_log(error_log_path, filename, errors, timestamp_error_count=0,
             details_file.write("="*80 + "\n")
             details_file.write(f"DETAILED VALIDATION ERRORS FOR: {filename}\n")
             details_file.write("="*80 + "\n\n")
-            
+
             for i, error in enumerate(validation_error_details, 1):
-                if " -> Row " in error:
-                    error_part, row_part = error.split(" -> Row ", 1)
-                    row_num = row_part.split(": ", 1)[0]
-                    row_data = row_part.split(": ", 1)[1] if ": " in row_part else ""
-                    
-                    error_message = error_part.replace("Error: ", "")
-                    
-                    individual_errors = error_message.split("; ")
-                    
+                if isinstance(error, dict):
+                    row_num = error["row"]
+                    row_data = error["row_data"]
+                    individual_errors = error["message"].split("; ")
+
                     details_file.write(f"#{i}. ROW {row_num} VALIDATION ERRORS\n")
                     details_file.write("-" * 50 + "\n")
-                    
+
                     for j, individual_error in enumerate(individual_errors, 1):
                         details_file.write(f"   {j}. {individual_error}\n")
-                    
+
                     details_file.write(f"\n   Row Data: {row_data}\n")
                     details_file.write("\n" + "="*80 + "\n\n")
                 else:
@@ -478,10 +474,6 @@ def classify_csv(file_path):
             
 
             validation_error_details = validator.validation_error_details + validator.timestamp_error_details
-            
-            timestamp_errors = [error for error in validation_error_details 
-                              if "appears to be in" in error and "format" in error
-                              or "should be an integer (UNIX timestamp in milliseconds)" in error]
             timestamp_error_count = len(validator.timestamp_error_details)
             
             validator_error_count = len(validator.validation_error_details)

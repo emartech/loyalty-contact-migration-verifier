@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 SAP Emarsys
+# SPDX-FileCopyrightText: 2024 SAP Engagement Cloud
 # SPDX-License-Identifier: MIT
 
 import csv
@@ -67,76 +67,72 @@ class Validator:
             
             self._last_progress_update = current_time
 
+    @staticmethod
+    def format_error_string(error_dict):
+        return f"Error: {error_dict['message']} -> Row {error_dict['row']}: {error_dict['row_data']}"
+
     def validate(self):
         # Initialize progress tracking
         if self._enable_progress_tracking:
             self._start_time = time.time()
             print(f"    Starting validation of {self._total_rows:,} rows...")
-        
+
         content = self._load_csv()
         headers = content[0]
-        
+
         has_errors = False
         timestamp_error_rows = []
         error_count = 0
-        
+
         # Memory-efficient error handling - write errors incrementally for large files
         use_streaming_errors = self._enable_progress_tracking and self._total_rows > 10000
-        
+
         for idx, row in enumerate(content[1:], start=2):
             # Update progress for large files
             if self._enable_progress_tracking:
                 self._update_progress(idx)
-            
+
             validation_result = self._validate_row(row)
-            
+
             if len(validation_result) == 3:
                 is_valid, row_errors, timestamp_errors = validation_result
                 if timestamp_errors:
                     timestamp_error_rows.append((idx, row, timestamp_errors))
             else:
                 is_valid, row_errors = validation_result
-                
+
             if not is_valid:
                 has_errors = True
                 error_count += 1
-                
-                # For large files, write errors immediately to save memory
-                if use_streaming_errors:
-                    row_error_message = f"Error: {row_errors} -> Row {idx}: {row}"
-                    self.validation_error_details.append(row_error_message)
-                    if self.error_logger:
-                        self.error_logger.log(row_error_message)
-                    
-                    # Limit memory usage by flushing every 100 errors
-                    if error_count % 100 == 0 and self.error_logger:
-                        self.error_logger.flush_if_possible()
-                else:
-                    # Normal processing for smaller files
-                    row_error_message = f"Error: {row_errors} -> Row {idx}: {row}"
-                    self.validation_error_details.append(row_error_message)
-                    if self.error_logger:
-                        self.error_logger.log(row_error_message)
-        
+
+                error_dict = {"row": idx, "message": row_errors, "row_data": row}
+                self.validation_error_details.append(error_dict)
+                if self.error_logger:
+                    self.error_logger.log(Validator.format_error_string(error_dict))
+
+                # Limit memory usage by flushing every 100 errors on large files
+                if use_streaming_errors and error_count % 100 == 0 and self.error_logger:
+                    self.error_logger.flush_if_possible()
+
         # Complete progress tracking
         if self._enable_progress_tracking:
             print(f"\r    Validation complete: {self._processed_rows:,} rows processed in {time.time() - self._start_time:.1f}s")
-        
+
         # Handle timestamp errors
         if timestamp_error_rows:
             self._timestamp_error_count = len(timestamp_error_rows)
             for idx, row, timestamp_errors in timestamp_error_rows:
                 for error in timestamp_errors:
-                    timestamp_error_message = f"Error: {error} -> Row {idx}: {row}"
-                    self.timestamp_error_details.append(timestamp_error_message)
+                    ts_error_dict = {"row": idx, "message": error, "row_data": row}
+                    self.timestamp_error_details.append(ts_error_dict)
                     if self.error_logger:
-                        self.error_logger.log(timestamp_error_message)
-        
+                        self.error_logger.log(Validator.format_error_string(ts_error_dict))
+
         if has_errors:
             if self._enable_progress_tracking:
                 print(f"     Found {error_count:,} validation errors")
             return False
-        
+
         return True
     
 

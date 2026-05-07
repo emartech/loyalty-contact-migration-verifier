@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loyalty CSV Verifier</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0d1117;
+    --surface:     #161b22;
+    --surface2:    #1c2128;
+    --border:      #30363d;
+    --border-sub:  #21262d;
+    --text:        #c9d1d9;
+    --text-bright: #e6edf3;
+    --text-muted:  #6e7681;
+    --blue:        #388bfd;
+    --green:       #3fb950;
+    --red:         #f85149;
+    --amber:       #d29922;
+  }
+
+  html { scrollbar-color: #30363d #0d1117; scrollbar-width: thin; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- Header ---- */
+  header {
+    background: linear-gradient(180deg, #1a2332 0%, var(--surface) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .header-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #1c3a6e 0%, #0a6ed1 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .header-icon svg { display: block; }
+
+  header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-bright);
+    letter-spacing: .2px;
+  }
+
+  header .divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 2px;
+  }
+
+  header .sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ---- Main ---- */
+  main {
+    max-width: 860px;
+    width: 100%;
+    margin: 36px auto;
+    padding: 0 20px;
+    flex: 1;
+  }
+
+  /* ---- Drop zone ---- */
+  #drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    padding: 52px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #drop-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(56,139,253,.06) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity .2s;
+  }
+
+  #drop-zone:hover, #drop-zone:focus-visible {
+    border-color: #484f58;
+    outline: none;
+  }
+
+  #drop-zone.drag-over {
+    border-color: var(--blue);
+    background: #131d2e;
+  }
+
+  #drop-zone.drag-over::before { opacity: 1; }
+
+  .drop-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    color: var(--text-muted);
+    transition: color .2s;
+  }
+
+  #drop-zone.drag-over .drop-icon { color: var(--blue); }
+
+  #drop-zone p.primary {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 6px;
+  }
+
+  #drop-zone p.secondary {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  #drop-zone a.browse-link {
+    color: var(--blue);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+
+  #drop-zone a.browse-link:hover { border-color: var(--blue); }
+
+  .drop-hint {
+    display: inline-flex;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .drop-hint span {
+    background: var(--surface2);
+    border: 1px solid var(--border-sub);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-weight: 500;
+  }
+
+  #file-input { display: none; }
+
+  /* ---- Results header ---- */
+  #results-header {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    margin-bottom: 10px;
+    padding: 0 2px;
+  }
+
+  .results-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .7px;
+  }
+
+  #summary-counts {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  .count-pass { color: var(--green); font-weight: 600; }
+  .count-fail { color: var(--red);   font-weight: 600; }
+
+  #results-actions { display: flex; align-items: center; gap: 8px; }
+
+  #clear-btn {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: none;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    padding: 3px 10px;
+    border-radius: 5px;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+
+  #clear-btn:hover {
+    color: var(--text-bright);
+    border-color: #484f58;
+    background: var(--surface2);
+  }
+
+  /* ---- Results list ---- */
+  #results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ---- Card ---- */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: slideIn .18s ease-out both;
+    border-left-width: 3px;
+    border-left-color: transparent;
+    transition: border-left-color .2s;
+  }
+
+  .card[data-state="valid"]   { border-left-color: var(--green); }
+  .card[data-state="error"]   { border-left-color: var(--red);   }
+  .card[data-state="pending"] { border-left-color: var(--border); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px 12px 13px;
+    border-bottom: 1px solid var(--border-sub);
+  }
+
+  .filename {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-bright);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .badge-contacts { background: #1c2e4a; color: #79c0ff; border: 1px solid #1f3d66; }
+  .badge-points   { background: #1a3028; color: #56d364; border: 1px solid #1f4030; }
+  .badge-vouchers { background: #2d1f0a; color: #e3b341; border: 1px solid #4a3410; }
+  .badge-unknown  { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+
+  .row-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border-sub);
+    border-radius: 10px;
+    padding: 1px 7px;
+  }
+
+  /* ---- Card status bar ---- */
+  .card-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-dot-valid   { background: var(--green); box-shadow: 0 0 5px rgba(63,185,80,.5); }
+  .status-dot-error   { background: var(--red);   box-shadow: 0 0 5px rgba(248,81,73,.5); }
+  .status-dot-pending { background: var(--text-muted); }
+
+  .status-valid   { font-weight: 600; color: var(--green); }
+  .status-errors  { font-weight: 600; color: var(--red);   }
+
+  .toggle-btn {
+    font-size: 12px;
+    color: var(--blue);
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 5px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background .15s, border-color .15s;
+    white-space: nowrap;
+  }
+
+  .toggle-btn:hover {
+    background: #1c2e4a;
+    border-color: #1f3d66;
+  }
+
+  .chevron {
+    display: inline-block;
+    transition: transform .18s;
+    font-style: normal;
+    font-size: 10px;
+    line-height: 1;
+  }
+
+  .chevron.up { transform: rotate(180deg); }
+
+  /* ---- Error table ---- */
+  .error-table-wrap {
+    overflow-x: auto;
+    border-top: 1px solid var(--border-sub);
+    overflow: hidden;
+    max-height: 9999px;
+    transition: max-height .22s ease-in-out, opacity .18s;
+    opacity: 1;
+  }
+
+  .error-table-wrap.collapsed {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 6px 14px;
+    background: #0d1117;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--border-sub);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border-sub);
+    transition: background .1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 7px 14px;
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .row-num {
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    width: 64px;
+  }
+
+  /* File-level error row */
+  tr.file-level-row { background: rgba(210,153,34,.05); }
+  tr.file-level-row:hover { background: rgba(210,153,34,.1); }
+
+  .file-level-cell {
+    color: var(--amber);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .file-level-msg { color: #e3b341; }
+
+  /* ---- Spinner ---- */
+  .spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .validating-text { color: var(--text-muted); font-size: 13px; }
+
+  /* ---- Footer ---- */
+  footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 11px;
+    color: #484f58;
+    border-top: 1px solid var(--border-sub);
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 2h7l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="#79c0ff" stroke-width="1.2" fill="none"/>
+      <path d="M10 2v3h3" stroke="#79c0ff" stroke-width="1.2" fill="none"/>
+      <path d="M5 7h6M5 9.5h6M5 12h4" stroke="#79c0ff" stroke-width="1" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <h1>Loyalty CSV Verifier</h1>
+  <div class="divider"></div>
+  <span class="sub">Contacts &middot; Points &middot; Vouchers</span>
+</header>
+
+<main>
+  <div id="drop-zone" role="button" tabindex="0" aria-label="Drop CSV files here or click to browse">
+    <svg class="drop-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="6" width="32" height="36" rx="3" stroke="currentColor" stroke-width="2.2"/>
+      <path d="M16 14h16M16 20h16M16 26h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="36" cy="36" r="9" fill="#0d1117" stroke="currentColor" stroke-width="2"/>
+      <path d="M36 32v8M32 36l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <p class="primary">Drop CSV files here</p>
+    <p class="secondary">or <a class="browse-link" id="browse-link">browse to upload</a> &mdash; multiple files at once supported</p>
+    <div class="drop-hint">
+      <span>Contacts</span>
+      <span>Points</span>
+      <span>Vouchers</span>
+    </div>
+  </div>
+
+  <input type="file" id="file-input" accept=".csv" multiple>
+
+  <div id="results-header">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="results-label">Results</span>
+      <span id="summary-counts"></span>
+    </div>
+    <div id="results-actions">
+      <button id="clear-btn">Clear all</button>
+    </div>
+  </div>
+
+  <div id="results-list" aria-live="polite"></div>
+</main>
+
+<footer>3rd Line Engineers @ 2026 SAP Engagement Cloud</footer>
+
+<script>
+(function () {
+  const dropZone   = document.getElementById('drop-zone');
+  const fileInput  = document.getElementById('file-input');
+  const browseLink = document.getElementById('browse-link');
+  const resultList = document.getElementById('results-list');
+  const resultsHdr = document.getElementById('results-header');
+  const summaryEl  = document.getElementById('summary-counts');
+  const clearBtn   = document.getElementById('clear-btn');
+
+  let stats = { pass: 0, fail: 0 };
+
+  // Drag events
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', e => { if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('drag-over'); });
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+  browseLink.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+  fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+  clearBtn.addEventListener('click', () => {
+    resultList.innerHTML = '';
+    resultsHdr.style.display = 'none';
+    stats = { pass: 0, fail: 0 };
+    fileInput.value = '';
+  });
+
+  function handleFiles(files) {
+    if (!files || files.length === 0) return;
+    resultsHdr.style.display = 'flex';
+    Array.from(files).forEach(file => {
+      const card = createPendingCard(file.name);
+      resultList.prepend(card);
+      validateFile(file, card);
+    });
+    fileInput.value = '';
+  }
+
+  function createPendingCard(filename) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.state = 'pending';
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="filename" title="${esc(filename)}">${esc(filename)}</span>
+      </div>
+      <div class="card-status">
+        <span class="spinner"></span>
+        <span class="validating-text">Validating...</span>
+      </div>`;
+    return card;
+  }
+
+  function validateFile(file, card) {
+    const fd = new FormData();
+    fd.append('file', file);
+    fetch('/validate', { method: 'POST', body: fd })
+      .then(r => r.json())
+      .then(data => { renderResult(card, data); updateSummary(); })
+      .catch(err => { renderNetworkError(card, file.name, err.message); updateSummary(); });
+  }
+
+  function renderResult(card, d) {
+    const badgeClass = { Contacts: 'badge-contacts', Points: 'badge-points', Vouchers: 'badge-vouchers' }[d.csv_type] || 'badge-unknown';
+    const rowLabel   = d.row_count > 0 ? `${d.row_count.toLocaleString()} row${d.row_count !== 1 ? 's' : ''}` : '';
+    const errors     = d.errors || [];
+    const errorCount = errors.length;
+    const autoExpand = errorCount > 0 && errorCount <= 10;
+
+    card.dataset.state = d.is_valid ? 'valid' : 'error';
+    if (d.is_valid) stats.pass++; else stats.fail++;
+
+    let statusHtml;
+    if (d.is_valid) {
+      statusHtml = `<span class="status-dot status-dot-valid"></span><span class="status-valid">Valid</span>`;
+    } else {
+      const label = errorCount === 1 ? '1 error' : `${errorCount.toLocaleString()} errors`;
+      statusHtml = `
+        <span class="status-dot status-dot-error"></span>
+        <span class="status-errors">${label}</span>
+        <button class="toggle-btn" data-expanded="${autoExpand}">
+          ${autoExpand ? 'Collapse' : 'Show errors'}<i class="chevron${autoExpand ? ' up' : ''}">&#9660;</i>
+        </button>`;
+    }
+
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="filename" title="${esc(d.filename)}">${esc(d.filename)}</span>
+        <span class="badge ${badgeClass}">${esc(d.csv_type)}</span>
+        ${rowLabel ? `<span class="row-count">${rowLabel}</span>` : ''}
+      </div>
+      <div class="card-status">${statusHtml}</div>
+      ${buildErrorTable(errors, autoExpand)}`;
+
+    const toggleBtn = card.querySelector('.toggle-btn');
+    const tableWrap = card.querySelector('.error-table-wrap');
+    if (toggleBtn && tableWrap) {
+      toggleBtn.addEventListener('click', () => {
+        const expanded = toggleBtn.dataset.expanded === 'true';
+        tableWrap.classList.toggle('collapsed', expanded);
+        const chevron = toggleBtn.querySelector('.chevron');
+        if (expanded) {
+          toggleBtn.childNodes[0].textContent = 'Show errors';
+          chevron.classList.remove('up');
+        } else {
+          toggleBtn.childNodes[0].textContent = 'Collapse';
+          chevron.classList.add('up');
+        }
+        toggleBtn.dataset.expanded = String(!expanded);
+      });
+    }
+  }
+
+  function buildErrorTable(errors, autoExpand) {
+    if (!errors || errors.length === 0) return '';
+
+    const rows = errors.map(e => {
+      if (e.row == null) {
+        return `<tr class="file-level-row">
+          <td class="file-level-cell">&#9651; File</td>
+          <td class="file-level-msg">${esc(e.message)}</td>
+        </tr>`;
+      }
+      return `<tr>
+        <td class="row-num">${e.row}</td>
+        <td>${esc(e.message)}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+      <div class="error-table-wrap${autoExpand ? '' : ' collapsed'}">
+        <table>
+          <thead><tr><th>Row</th><th>Error</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderNetworkError(card, filename, message) {
+    stats.fail++;
+    card.dataset.state = 'error';
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="filename" title="${esc(filename)}">${esc(filename)}</span>
+        <span class="badge badge-unknown">Unknown</span>
+      </div>
+      <div class="card-status">
+        <span class="status-dot status-dot-error"></span>
+        <span class="status-errors">Network error: ${esc(message)}</span>
+      </div>`;
+  }
+
+  function updateSummary() {
+    const parts = [];
+    if (stats.pass > 0) parts.push(`<span class="count-pass">${stats.pass} passed</span>`);
+    if (stats.fail > 0) parts.push(`<span class="count-fail">${stats.fail} failed</span>`);
+    summaryEl.innerHTML = parts.join('<span style="color:var(--border)">&nbsp;/&nbsp;</span>');
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+})();
+</script>
+</body>
+</html>

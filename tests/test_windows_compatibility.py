@@ -21,7 +21,7 @@ def get_python_files() -> list[Path]:
     project_root = get_project_root()
     python_files = []
     
-    exclude_dirs = {'.venv', 'venv', '__pycache__', '.git', 'node_modules', '.tox', '.eggs'}
+    exclude_dirs = {'.venv', '.venv-web', 'venv', '__pycache__', '.git', 'node_modules', '.tox', '.eggs'}
     
     for root, dirs, files in os.walk(project_root):
         # Modify dirs in-place to skip excluded directories
